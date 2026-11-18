@@ -1,4 +1,6 @@
 import { Geist, Geist_Mono } from 'next/font/google';
+import Navbar from '@/components/shared/Navbar';
+import Footer from '@/components/shared/Footer';
 import './globals.css';
 
 const geistSans = Geist({
@@ -17,13 +19,17 @@ export const metadata = {
     template: '%s | MentorLagbe',
   },
   description:
-    'Connect with qualified tutors and find the right tuition opportunities with MentorLagbe.',
+    'Connect with qualified tutors and discover the right tuition opportunities with MentorLagbe.',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Navbar />
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }
