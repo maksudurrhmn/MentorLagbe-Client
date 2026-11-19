@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { MongoClient } from 'mongodb';
 import { mongodbAdapter } from '@better-auth/mongo-adapter';
+import { jwt } from 'better-auth/plugins';
 
 const uri = process.env.MONGODB_URI;
 const dbName = process.env.DB_NAME;
@@ -35,4 +36,15 @@ export const auth = betterAuth({
       },
     },
   },
+  plugins: [
+    jwt({
+      jwt: {
+        definePayload: ({ user }) => ({
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        }),
+      },
+    }),
+  ],
 });
