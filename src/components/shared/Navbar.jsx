@@ -41,7 +41,7 @@ export default function Navbar() {
           <ThemeToggle />
 
           <Link
-            href="/login"
+            href="/signin"
             className="text-sm font-semibold text-foreground transition hover:text-primary"
           >
             Log in
@@ -86,7 +86,7 @@ export default function Navbar() {
               <ThemeToggle />
 
               <Link
-                href="/login"
+                href="/signin"
                 onClick={() => setIsOpen(false)}
                 className="text-sm font-semibold text-foreground transition hover:text-primary"
               >
