@@ -48,7 +48,7 @@ export default function Navbar() {
           </Link>
 
           <Link
-            href="/register"
+            href="/signup"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
           >
             Get Started <ArrowRight size={16} />
@@ -94,7 +94,7 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="/register"
+                href="/signup"
                 onClick={() => setIsOpen(false)}
                 className="rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
