@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { authClient } from '@/lib/auth-client';
+import { apiRequest } from '@/lib/api';
 
 export default function TestApiPage() {
   const [result, setResult] = useState(null);
@@ -12,29 +12,15 @@ export default function TestApiPage() {
     setResult(null);
 
     try {
-      // Get a JWT from Better Auth
-      const { data, error } = await authClient.token();
-
-      if (error || !data?.token) {
-        throw new Error(error?.message || 'Unable to retrieve JWT.');
-      }
-
-      // Send the JWT to the Express backend
-      const response = await fetch('http://localhost:5000/api/protected/admin', {
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
-      });
-
-      const responseData = await response.json();
+      const data = await apiRequest('/api/protected/student');
 
       setResult({
-        status: response.status,
-        data: responseData,
+        status: 200,
+        data,
       });
     } catch (error) {
       setResult({
-        status: 'Error',
+        status: error.status || 'Error',
         data: { message: error.message },
       });
     } finally {
