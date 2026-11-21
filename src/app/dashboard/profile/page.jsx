@@ -1,11 +1,25 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import {
+  UserRound,
+  LoaderCircle,
+  Camera,
+  Save,
+  User,
+  Phone,
+  FileText,
+  Mail,
+  ShieldCheck,
+  CreditCard,
+  ImagePlus,
+} from 'lucide-react';
+
 import { apiRequest } from '@/lib/api';
-import { UserRound, LoaderCircle, Camera, Save } from 'lucide-react';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -27,12 +41,14 @@ export default function ProfilePage() {
         const user = response.data;
 
         setProfile(user);
+
         setFormData({
           name: user.name || '',
           phone: user.phone || '',
           bio: user.bio || '',
           image: user.image || '',
         });
+
         setPreview(user.image || '');
       } catch (err) {
         setError(err.message || 'Unable to load your profile.');
@@ -43,6 +59,13 @@ export default function ProfilePage() {
 
     loadProfile();
   }, []);
+
+  // Clean up temporary image previews.
+  useEffect(() => {
+    if (preview.startsWith('blob:')) {
+      return () => URL.revokeObjectURL(preview);
+    }
+  }, [preview]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -136,193 +159,263 @@ export default function ProfilePage() {
     }
   };
 
+  const inputClass =
+    'w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/10';
+
+  const labelClass = 'mb-2 block text-sm font-medium text-foreground';
+
   if (loading) {
     return (
-      <div className="flex min-h-64 items-center justify-center">
-        <LoaderCircle className="animate-spin text-blue-600" size={30} />
-      </div>
+      <main className="px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-64 max-w-7xl items-center justify-center">
+          <LoaderCircle size={30} className="animate-spin text-primary" />
+        </div>
+      </main>
     );
   }
 
   if (error && !profile) {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-600 dark:border-red-900 dark:bg-red-950/30">
-        {error}
-      </div>
+      <main className="px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl rounded-xl border border-red-500/20 bg-red-500/5 p-5 text-sm text-red-500">
+          {error}
+        </div>
+      </main>
     );
   }
 
   if (!profile) return null;
 
-  const inputClass =
-    'w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white';
-
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Profile</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Manage your personal information and profile picture.
-        </p>
-      </div>
+    <main className="px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-8">
+        {/* Page Heading */}
+        <section>
+          <p className="text-sm font-medium text-primary">Account Settings</p>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Profile picture */}
-        <section className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-          <h2 className="mb-5 font-semibold text-gray-900 dark:text-white">Profile Picture</h2>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            My Profile
+          </h1>
 
-          <div className="flex flex-col items-center gap-5 sm:flex-row">
-            <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-              {preview ? (
-                <img src={preview} alt="Profile preview" className="size-full object-cover" />
-              ) : (
-                <UserRound size={40} className="text-gray-400" />
-              )}
+          <p className="mt-2 text-sm text-muted">
+            Manage your personal information and account details.
+          </p>
+        </section>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Profile Picture */}
+          <section className="rounded-xl border border-border bg-surface p-5 sm:p-6">
+            <div className="mb-5">
+              <h2 className="font-semibold text-foreground">Profile Picture</h2>
+
+              <p className="mt-1 text-sm text-muted">
+                Choose a profile photo to personalize your account.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+              <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-background">
+                {preview ? (
+                  <img src={preview} alt="Profile preview" className="size-full object-cover" />
+                ) : (
+                  <UserRound size={38} className="text-muted" />
+                )}
+              </div>
+
+              <div className="min-w-0">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5">
+                  <Camera size={17} />
+                  Choose Image
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+
+                <p className="mt-2 text-xs text-muted">JPG, PNG or WEBP. Maximum file size 5 MB.</p>
+
+                {selectedFile && (
+                  <p className="mt-2 truncate text-xs font-medium text-primary">
+                    Selected: {selectedFile.name}
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* Personal Information */}
+          <section className="space-y-5 rounded-xl border border-border bg-surface p-5 sm:p-6">
+            <div>
+              <h2 className="font-semibold text-foreground">Personal Information</h2>
+
+              <p className="mt-1 text-sm text-muted">
+                Update your personal details and introduction.
+              </p>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="name" className={labelClass}>
+                  Full Name
+                </label>
+
+                <div className="relative">
+                  <User size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    maxLength={80}
+                    className={`${inputClass} pl-11`}
+                    placeholder="Enter your full name"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="phone" className={labelClass}>
+                  Phone Number
+                </label>
+
+                <div className="relative">
+                  <Phone
+                    size={17}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+                  />
+
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    maxLength={30}
+                    className={`${inputClass} pl-11`}
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+              </div>
             </div>
 
             <div>
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800">
-                <Camera size={17} />
-                Choose Image
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
+              <label htmlFor="bio" className={labelClass}>
+                Bio
               </label>
 
-              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                JPG, PNG or WEBP. Maximum size 5 MB.
+              <div className="relative">
+                <FileText size={17} className="absolute left-4 top-4 text-muted" />
+
+                <textarea
+                  id="bio"
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleChange}
+                  rows={4}
+                  maxLength={500}
+                  className={`${inputClass} resize-y pl-11`}
+                  placeholder="Tell us a little about yourself..."
+                />
+              </div>
+
+              <p className="mt-2 text-right text-xs text-muted">
+                {formData.bio.length}/500 characters
               </p>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Personal information */}
-        <section className="space-y-5 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-          <h2 className="font-semibold text-gray-900 dark:text-white">Personal Information</h2>
-
-          <div>
-            <label
-              htmlFor="name"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Full Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              maxLength={80}
-              className={inputClass}
-              placeholder="Enter your full name"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="phone"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Phone Number
-            </label>
-            <input
-              id="phone"
-              name="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={handleChange}
-              maxLength={30}
-              className={inputClass}
-              placeholder="Enter your phone number"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="bio"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Bio
-            </label>
-            <textarea
-              id="bio"
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              rows={4}
-              maxLength={500}
-              className={inputClass}
-              placeholder="Tell us a little about yourself..."
-            />
-            <p className="mt-1 text-right text-xs text-gray-400">{formData.bio.length}/500</p>
-          </div>
-        </section>
-
-        {/* Account information */}
-        <section className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-          <h2 className="font-semibold text-gray-900 dark:text-white">Account Information</h2>
-
-          <div className="grid gap-4 sm:grid-cols-2">
+          {/* Account Information */}
+          <section className="space-y-5 rounded-xl border border-border bg-surface p-5 sm:p-6">
             <div>
-              <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">Email Address</p>
-              <p className="break-all text-sm font-medium text-gray-900 dark:text-white">
-                {profile.email}
+              <h2 className="font-semibold text-foreground">Account Information</h2>
+
+              <p className="mt-1 text-sm text-muted">
+                Your account details and subscription information.
               </p>
             </div>
 
-            <div>
-              <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">Account Role</p>
-              <p className="text-sm font-medium capitalize text-gray-900 dark:text-white">
-                {profile.role}
-              </p>
-            </div>
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="flex items-start gap-3">
+                <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                  <Mail size={19} />
+                </div>
 
-            <div>
-              <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">Current Plan</p>
-              <p className="text-sm font-medium capitalize text-gray-900 dark:text-white">
-                {profile.plan || 'free'}
-              </p>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted">Email Address</p>
+                  <p className="mt-1 break-all text-sm font-medium text-foreground">
+                    {profile.email}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                  <ShieldCheck size={19} />
+                </div>
+
+                <div>
+                  <p className="text-xs text-muted">Account Role</p>
+                  <p className="mt-1 text-sm font-medium capitalize text-foreground">
+                    {profile.role}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                  <CreditCard size={19} />
+                </div>
+
+                <div>
+                  <p className="text-xs text-muted">Current Plan</p>
+                  <p className="mt-1 text-sm font-medium capitalize text-foreground">
+                    {profile.plan || 'free'}
+                  </p>
+                </div>
+              </div>
             </div>
+          </section>
+
+          {/* Feedback Messages */}
+          {message && (
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm text-emerald-600">
+              {message}
+            </div>
+          )}
+
+          {error && (
+            <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-sm text-red-500">
+              {error}
+            </div>
+          )}
+
+          {/* Save Button */}
+          <div className="flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:justify-end">
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {saving ? (
+                <>
+                  <LoaderCircle size={17} className="animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={17} />
+                  Save Changes
+                </>
+              )}
+            </button>
           </div>
-        </section>
-
-        {message && (
-          <p className="rounded-xl bg-green-50 p-3 text-sm text-green-700 dark:bg-green-950/30 dark:text-green-400">
-            {message}
-          </p>
-        )}
-
-        {error && (
-          <p className="rounded-xl bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950/30 dark:text-red-400">
-            {error}
-          </p>
-        )}
-
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {saving ? (
-              <>
-                <LoaderCircle size={17} className="animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save size={17} />
-                Save Changes
-              </>
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </main>
   );
 }
