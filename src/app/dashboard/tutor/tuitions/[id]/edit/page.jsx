@@ -4,7 +4,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { apiRequest } from '@/lib/api';
-import { ArrowLeft, ImagePlus, LoaderCircle, Save } from 'lucide-react';
+import {
+  ArrowLeft,
+  BookOpen,
+  CalendarDays,
+  FileText,
+  ImagePlus,
+  LoaderCircle,
+  MapPin,
+  Save,
+  Wallet,
+} from 'lucide-react';
 
 export default function EditTuitionPage() {
   const { id } = useParams();
@@ -29,7 +39,16 @@ export default function EditTuitionPage() {
   const [message, setMessage] = useState('');
 
   const inputClass =
-    'w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white';
+    'w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/10';
+
+  const labelClass = 'mb-2 block text-sm font-medium text-foreground';
+
+  // Clean up temporary image preview URLs.
+  useEffect(() => {
+    if (!preview || !preview.startsWith('blob:')) return;
+
+    return () => URL.revokeObjectURL(preview);
+  }, [preview]);
 
   const loadTuition = useCallback(async () => {
     setLoading(true);
@@ -153,6 +172,9 @@ export default function EditTuitionPage() {
       setPreview(bannerImage);
       setImageFile(null);
       setMessage('Tuition updated successfully. It is now pending admin approval.');
+
+      const fileInput = document.getElementById('bannerImage');
+      if (fileInput) fileInput.value = '';
     } catch (err) {
       setError(err.message || 'Unable to update tuition.');
     } finally {
@@ -160,308 +182,368 @@ export default function EditTuitionPage() {
     }
   };
 
+  // Loading state
   if (loading) {
     return (
-      <div className="flex min-h-64 items-center justify-center">
-        <LoaderCircle size={30} className="animate-spin text-blue-600" />
-      </div>
+      <main className="px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex min-h-64 items-center justify-center">
+          <LoaderCircle size={30} className="animate-spin text-primary" />
+        </div>
+      </main>
     );
   }
 
+  // Error state
   if (error && !formData.title) {
     return (
-      <div className="mx-auto max-w-3xl space-y-4">
-        <Link
-          href="/dashboard/tutor/tuitions"
-          className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600"
-        >
-          <ArrowLeft size={16} />
-          Back to My Tuitions
-        </Link>
+      <main className="px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl space-y-5">
+          <Link
+            href="/dashboard/tutor/tuitions"
+            className="inline-flex items-center gap-2 text-sm font-medium text-muted transition hover:text-primary"
+          >
+            <ArrowLeft size={16} />
+            Back to My Tuitions
+          </Link>
 
-        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-600 dark:bg-red-950/30 dark:text-red-400">
-          {error}
+          <div
+            role="alert"
+            className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
+          >
+            {error}
+          </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <Link
-          href="/dashboard/tutor/tuitions"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-gray-500 transition hover:text-blue-600 dark:text-gray-400"
-        >
-          <ArrowLeft size={16} />
-          Back to My Tuitions
-        </Link>
-
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Tuition</h1>
-
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Update your tuition details and submit them for review.
-        </p>
-      </div>
-
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900"
-      >
-        {/* Basic information */}
-        <section className="space-y-5">
-          <h2 className="font-semibold text-gray-900 dark:text-white">Basic Information</h2>
-
-          <div>
-            <label
-              htmlFor="title"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Tuition Title *
-            </label>
-            <input
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              maxLength={120}
-              className={inputClass}
-              placeholder="Enter tuition title"
-            />
-          </div>
-
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="subject"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Subject *
-              </label>
-              <input
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                required
-                maxLength={60}
-                className={inputClass}
-                placeholder="e.g. Mathematics"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="classLevel"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Class Level *
-              </label>
-              <input
-                id="classLevel"
-                name="classLevel"
-                value={formData.classLevel}
-                onChange={handleChange}
-                required
-                maxLength={60}
-                className={inputClass}
-                placeholder="e.g. Class 9"
-              />
-            </div>
-          </div>
-        </section>
-
-        <div className="border-t border-gray-100 dark:border-gray-800" />
-
-        {/* Tuition details */}
-        <section className="space-y-5">
-          <h2 className="font-semibold text-gray-900 dark:text-white">Tuition Details</h2>
-
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="mode"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Tuition Mode *
-              </label>
-              <select
-                id="mode"
-                name="mode"
-                value={formData.mode}
-                onChange={handleChange}
-                className={inputClass}
-              >
-                <option value="Online">Online</option>
-                <option value="Offline">Offline</option>
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="location"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Location {formData.mode === 'Offline' ? '*' : '(Optional)'}
-              </label>
-              <input
-                id="location"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                required={formData.mode === 'Offline'}
-                maxLength={120}
-                className={inputClass}
-                placeholder="e.g. Dhanmondi, Dhaka"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="monthlyFee"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Monthly Fee (৳) *
-              </label>
-              <input
-                id="monthlyFee"
-                name="monthlyFee"
-                type="number"
-                min="1"
-                value={formData.monthlyFee}
-                onChange={handleChange}
-                required
-                className={inputClass}
-                placeholder="e.g. 5000"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="daysPerWeek"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Days Per Week *
-              </label>
-              <select
-                id="daysPerWeek"
-                name="daysPerWeek"
-                value={formData.daysPerWeek}
-                onChange={handleChange}
-                required
-                className={inputClass}
-              >
-                {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                  <option key={day} value={day}>
-                    {day} {day === 1 ? 'Day' : 'Days'}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="description"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Description *
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-              rows={5}
-              maxLength={2000}
-              className={inputClass}
-              placeholder="Describe the tuition requirements, schedule, and expectations..."
-            />
-            <p className="mt-1 text-right text-xs text-gray-400">
-              {formData.description.length}/2000
-            </p>
-          </div>
-        </section>
-
-        <div className="border-t border-gray-100 dark:border-gray-800" />
-
-        {/* Banner image */}
-        <section className="space-y-4">
-          <h2 className="font-semibold text-gray-900 dark:text-white">Tuition Banner</h2>
-
-          <label
-            htmlFor="bannerImage"
-            className="flex min-h-44 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition hover:border-blue-400 dark:border-gray-700 dark:bg-gray-800/50"
-          >
-            {preview ? (
-              <img
-                src={preview}
-                alt="Tuition banner preview"
-                className="max-h-64 w-full object-cover"
-              />
-            ) : (
-              <div className="flex flex-col items-center p-6 text-center">
-                <ImagePlus size={32} className="mb-3 text-gray-400" />
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Click to upload a banner image
-                </p>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  JPG, PNG or WEBP · Maximum 5 MB
-                </p>
-              </div>
-            )}
-
-            <input
-              id="bannerImage"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleImageChange}
-              className="hidden"
-            />
-          </label>
-        </section>
-
-        {error && (
-          <p className="rounded-xl bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950/30 dark:text-red-400">
-            {error}
-          </p>
-        )}
-
-        {message && (
-          <p className="rounded-xl bg-green-50 p-3 text-sm text-green-700 dark:bg-green-950/30 dark:text-green-400">
-            {message}
-          </p>
-        )}
-
-        <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 dark:border-gray-800 sm:flex-row sm:justify-end">
+    <main className="px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-8">
+        {/* Page Header */}
+        <div>
           <Link
             href="/dashboard/tutor/tuitions"
-            className="rounded-xl border border-gray-200 px-6 py-3 text-center text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+            className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-muted transition hover:text-primary"
           >
-            Cancel
+            <ArrowLeft size={16} />
+            Back to My Tuitions
           </Link>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {saving ? (
-              <>
-                <LoaderCircle size={17} className="animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save size={17} />
-                Save Changes
-              </>
-            )}
-          </button>
+          <div className="flex items-start gap-3">
+            <div className="rounded-xl bg-primary/10 p-3 text-primary">
+              <BookOpen size={24} />
+            </div>
+
+            <div>
+              <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Edit Tuition</h1>
+              <p className="mt-1 text-sm text-muted">
+                Update your tuition details and submit them for review.
+              </p>
+            </div>
+          </div>
         </div>
-      </form>
-    </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Information */}
+          <section className="space-y-6 rounded-xl border border-border bg-surface p-5 sm:p-7">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                <BookOpen size={19} />
+              </div>
+
+              <div>
+                <h2 className="font-semibold text-foreground">Basic Information</h2>
+                <p className="text-xs text-muted">Update the subject and academic details.</p>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label htmlFor="title" className={labelClass}>
+                  Tuition Title *
+                </label>
+                <input
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                  maxLength={120}
+                  className={inputClass}
+                  placeholder="Enter tuition title"
+                />
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="subject" className={labelClass}>
+                    Subject *
+                  </label>
+                  <input
+                    id="subject"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                    maxLength={60}
+                    className={inputClass}
+                    placeholder="e.g. Mathematics"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="classLevel" className={labelClass}>
+                    Class Level *
+                  </label>
+                  <input
+                    id="classLevel"
+                    name="classLevel"
+                    value={formData.classLevel}
+                    onChange={handleChange}
+                    required
+                    maxLength={60}
+                    className={inputClass}
+                    placeholder="e.g. Class 9"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Tuition Details */}
+          <section className="space-y-6 rounded-xl border border-border bg-surface p-5 sm:p-7">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                <MapPin size={19} />
+              </div>
+
+              <div>
+                <h2 className="font-semibold text-foreground">Tuition Details</h2>
+                <p className="text-xs text-muted">
+                  Update the teaching mode, location, and schedule.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="mode" className={labelClass}>
+                  Tuition Mode *
+                </label>
+                <select
+                  id="mode"
+                  name="mode"
+                  value={formData.mode}
+                  onChange={handleChange}
+                  className={inputClass}
+                >
+                  <option value="Online">Online</option>
+                  <option value="Offline">Offline</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="location" className={labelClass}>
+                  Location {formData.mode === 'Offline' ? '*' : '(Optional)'}
+                </label>
+                <input
+                  id="location"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  required={formData.mode === 'Offline'}
+                  maxLength={120}
+                  className={inputClass}
+                  placeholder="e.g. Dhanmondi, Dhaka"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="monthlyFee" className={labelClass}>
+                  Monthly Fee (৳) *
+                </label>
+                <div className="relative">
+                  <Wallet
+                    size={17}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+                  />
+                  <input
+                    id="monthlyFee"
+                    name="monthlyFee"
+                    type="number"
+                    min="1"
+                    value={formData.monthlyFee}
+                    onChange={handleChange}
+                    required
+                    className={`${inputClass} pl-11`}
+                    placeholder="e.g. 5000"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="daysPerWeek" className={labelClass}>
+                  Days Per Week *
+                </label>
+                <div className="relative">
+                  <CalendarDays
+                    size={17}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+                  />
+                  <select
+                    id="daysPerWeek"
+                    name="daysPerWeek"
+                    value={formData.daysPerWeek}
+                    onChange={handleChange}
+                    required
+                    className={`${inputClass} pl-11`}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                      <option key={day} value={day}>
+                        {day} {day === 1 ? 'Day' : 'Days'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Description */}
+          <section className="space-y-5 rounded-xl border border-border bg-surface p-5 sm:p-7">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                <FileText size={19} />
+              </div>
+
+              <div>
+                <h2 className="font-semibold text-foreground">Description</h2>
+                <p className="text-xs text-muted">Update the requirements and expectations.</p>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="description" className={labelClass}>
+                Tuition Description *
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+                rows={6}
+                maxLength={2000}
+                className={`${inputClass} resize-y`}
+                placeholder="Describe the tuition requirements, schedule, and expectations..."
+              />
+              <p className="mt-2 text-right text-xs text-muted">
+                {formData.description.length}/2000 characters
+              </p>
+            </div>
+          </section>
+
+          {/* Banner Image */}
+          <section className="space-y-5 rounded-xl border border-border bg-surface p-5 sm:p-7">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                <ImagePlus size={19} />
+              </div>
+
+              <div>
+                <h2 className="font-semibold text-foreground">Tuition Banner</h2>
+                <p className="text-xs text-muted">
+                  Keep your current image or upload a replacement.
+                </p>
+              </div>
+            </div>
+
+            <label
+              htmlFor="bannerImage"
+              className="flex min-h-52 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border bg-background transition hover:border-primary/50"
+            >
+              {preview ? (
+                <div className="w-full">
+                  <img
+                    src={preview}
+                    alt="Tuition banner preview"
+                    className="max-h-80 w-full object-cover"
+                  />
+                  <p className="border-t border-border px-4 py-3 text-center text-xs font-medium text-primary">
+                    Click to change banner image
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center p-8 text-center">
+                  <div className="mb-3 rounded-xl bg-primary/10 p-4 text-primary">
+                    <Upload size={25} />
+                  </div>
+                  <p className="text-sm font-semibold text-foreground">
+                    Click to upload a banner image
+                  </p>
+                  <p className="mt-2 text-xs text-muted">JPG, PNG or WEBP · Maximum 5 MB</p>
+                </div>
+              )}
+
+              <input
+                id="bannerImage"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </label>
+          </section>
+
+          {/* Feedback */}
+          {error && (
+            <div
+              role="alert"
+              className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
+            >
+              {error}
+            </div>
+          )}
+
+          {message && (
+            <div
+              role="status"
+              className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700 dark:border-green-900/50 dark:bg-green-950/30 dark:text-green-400"
+            >
+              {message}
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-end">
+            <Link
+              href="/dashboard/tutor/tuitions"
+              className="rounded-xl border border-border px-6 py-3 text-center text-sm font-semibold text-foreground transition hover:bg-background"
+            >
+              Cancel
+            </Link>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {saving ? (
+                <>
+                  <LoaderCircle size={17} className="animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={17} />
+                  Save Changes
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
   );
 }
