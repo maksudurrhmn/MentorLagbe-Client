@@ -58,6 +58,36 @@ function StatCard({ title, value, description, icon: Icon }) {
   );
 }
 
+function DistributionRow({ label, value, total, color }) {
+  const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-3 text-sm">
+        <span className="font-medium text-foreground">{label}</span>
+
+        <span className="text-muted">
+          {value} ({percentage}%)
+        </span>
+      </div>
+
+      <div
+        role="progressbar"
+        aria-label={`${label} distribution`}
+        aria-valuenow={percentage}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        className="h-2.5 overflow-hidden rounded-full bg-background"
+      >
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${color}`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 function AdminDashboardContent() {
   const { user } = useAuth();
   const firstName = user?.name?.split(' ')[0] || 'Admin';
@@ -68,6 +98,15 @@ function AdminDashboardContent() {
     pendingTuitions: 0,
     approvedTuitions: 0,
     totalRevenue: 0,
+  });
+
+  const [distribution, setDistribution] = useState({
+    students: 0,
+    tutors: 0,
+    admins: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
   });
 
   const [recentUsers, setRecentUsers] = useState([]);
@@ -95,6 +134,18 @@ function AdminDashboardContent() {
       const tuitionList = Array.isArray(tuitionsData)
         ? tuitionsData
         : (tuitionsData?.tuitions ?? []);
+
+      setDistribution({
+        students: userList.filter((item) => item.role === 'student').length,
+        tutors: userList.filter((item) => item.role === 'tutor').length,
+        admins: userList.filter((item) => item.role === 'admin').length,
+
+        pending: tuitionList.filter((item) => item.approvalStatus === 'pending').length,
+
+        approved: tuitionList.filter((item) => item.approvalStatus === 'approved').length,
+
+        rejected: tuitionList.filter((item) => item.approvalStatus === 'rejected').length,
+      });
 
       setStats({
         totalUsers: statsData.totalUsers ?? 0,
@@ -355,6 +406,105 @@ function AdminDashboardContent() {
                 ))}
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Analytics */}
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Platform Analytics</h2>
+
+            <p className="mt-1 text-sm text-muted">
+              Visual insights into your platform's users and tuition activity.
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* User Distribution */}
+            <div className="space-y-6 rounded-xl border border-border bg-surface p-5 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground">User Distribution</h3>
+                  <p className="mt-1 text-xs text-muted">Breakdown by account role</p>
+                </div>
+
+                <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                  <Users size={20} />
+                </div>
+              </div>
+
+              <div className="text-3xl font-bold text-foreground">
+                {loading ? '—' : distribution.students + distribution.tutors + distribution.admins}
+                <span className="ml-2 text-sm font-normal text-muted">Total accounts</span>
+              </div>
+
+              <div className="space-y-5">
+                <DistributionRow
+                  label="Students"
+                  value={distribution.students}
+                  total={distribution.students + distribution.tutors + distribution.admins}
+                  color="bg-primary"
+                />
+
+                <DistributionRow
+                  label="Tutors"
+                  value={distribution.tutors}
+                  total={distribution.students + distribution.tutors + distribution.admins}
+                  color="bg-sky-500"
+                />
+
+                <DistributionRow
+                  label="Admins"
+                  value={distribution.admins}
+                  total={distribution.students + distribution.tutors + distribution.admins}
+                  color="bg-violet-500"
+                />
+              </div>
+            </div>
+
+            {/* Tuition Status */}
+            <div className="space-y-6 rounded-xl border border-border bg-surface p-5 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground">Tuition Status</h3>
+                  <p className="mt-1 text-xs text-muted">Moderation status breakdown</p>
+                </div>
+
+                <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                  <BookOpen size={20} />
+                </div>
+              </div>
+
+              <div className="text-3xl font-bold text-foreground">
+                {loading
+                  ? '—'
+                  : distribution.pending + distribution.approved + distribution.rejected}
+                <span className="ml-2 text-sm font-normal text-muted">Total posts</span>
+              </div>
+
+              <div className="space-y-5">
+                <DistributionRow
+                  label="Approved"
+                  value={distribution.approved}
+                  total={distribution.pending + distribution.approved + distribution.rejected}
+                  color="bg-emerald-500"
+                />
+
+                <DistributionRow
+                  label="Pending"
+                  value={distribution.pending}
+                  total={distribution.pending + distribution.approved + distribution.rejected}
+                  color="bg-amber-500"
+                />
+
+                <DistributionRow
+                  label="Rejected"
+                  value={distribution.rejected}
+                  total={distribution.pending + distribution.approved + distribution.rejected}
+                  color="bg-red-500"
+                />
+              </div>
+            </div>
           </div>
         </section>
 
