@@ -1,6 +1,5 @@
 import { Geist, Geist_Mono } from 'next/font/google';
-import Navbar from '@/components/shared/Navbar';
-import Footer from '@/components/shared/Footer';
+import AppShell from '@/components/shared/AppShell';
 import ThemeProvider from '@/components/shared/ThemeProvider';
 import './globals.css';
 
@@ -28,9 +27,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
-          <Navbar />
-          {children}
-          <Footer />
+          <AppShell>{children}</AppShell>
         </ThemeProvider>
       </body>
     </html>
