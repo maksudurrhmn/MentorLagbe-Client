@@ -110,7 +110,6 @@ export default function CreateTuitionPage() {
       setFormData(initialForm);
       setImageFile(null);
       setPreview('');
-
       const fileInput = document.getElementById('bannerImage');
       if (fileInput) fileInput.value = '';
     } catch (err) {
