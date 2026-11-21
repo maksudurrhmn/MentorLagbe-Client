@@ -28,7 +28,7 @@ export default function DashboardHeader({ onMenuClick }) {
 
   const handleLogout = async () => {
     await signOut();
-    router.replace('/login');
+    router.replace('/signin');
     router.refresh();
   };
 

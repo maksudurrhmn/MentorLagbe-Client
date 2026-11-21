@@ -46,7 +46,7 @@ const navigation = {
     },
     {
       label: 'My Profile',
-      href: '/dashboard/student/profile',
+      href: '/dashboard/profile',
       icon: UserRound,
     },
   ],
@@ -79,7 +79,7 @@ const navigation = {
     },
     {
       label: 'My Profile',
-      href: '/dashboard/tutor/profile',
+      href: '/dashboard/profile',
       icon: UserRound,
     },
   ],
@@ -109,6 +109,11 @@ const navigation = {
       label: 'Payments',
       href: '/dashboard/admin/payments',
       icon: CreditCard,
+    },
+    {
+      label: 'My Profile',
+      href: '/dashboard/profile',
+      icon: UserRound,
     },
   ],
 };

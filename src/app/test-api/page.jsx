@@ -1,56 +1,41 @@
 'use client';
 
 import { useState } from 'react';
-import { apiRequest } from '@/lib/api';
+import { authClient } from '@/lib/auth-client';
 
 export default function TestApiPage() {
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState('');
+  const [message, setMessage] = useState('');
 
-  const testProtectedAPI = async () => {
-    setLoading(true);
-    setResult(null);
-
+  const getToken = async () => {
     try {
-      const data = await apiRequest('/api/protected/student');
+      const { data, error } = await authClient.token();
 
-      setResult({
-        status: 200,
-        data,
-      });
+      if (error || !data?.token) {
+        setMessage(error?.message || 'Unable to retrieve JWT token.');
+        return;
+      }
+
+      setToken(data.token);
+      setMessage('JWT token retrieved successfully!');
     } catch (error) {
-      setResult({
-        status: error.status || 'Error',
-        data: { message: error.message },
-      });
-    } finally {
-      setLoading(false);
+      setMessage(error.message);
     }
   };
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-background px-4">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-surface p-8 shadow-lg">
-        <h1 className="text-2xl font-bold text-foreground">Protected API Test</h1>
+    <main className="mx-auto max-w-3xl p-8">
+      <h1 className="mb-4 text-2xl font-bold">JWT Token Test</h1>
 
-        <p className="mt-2 text-sm text-muted">
-          Test communication between Better Auth and your Express backend.
-        </p>
+      <button onClick={getToken} className="rounded-lg bg-blue-600 px-5 py-3 text-white">
+        Get JWT Token
+      </button>
 
-        <button
-          onClick={testProtectedAPI}
-          disabled={loading}
-          className="mt-6 w-full rounded-xl bg-primary px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
-        >
-          {loading ? 'Testing...' : 'Test Protected API'}
-        </button>
+      {message && <p className="mt-4">{message}</p>}
 
-        {result && (
-          <pre className="mt-6 overflow-x-auto rounded-xl bg-background p-4 text-sm text-foreground">
-            {JSON.stringify(result, null, 2)}
-          </pre>
-        )}
-      </div>
+      {token && (
+        <textarea readOnly value={token} className="mt-4 min-h-40 w-full rounded-lg border p-3" />
+      )}
     </main>
   );
 }
