@@ -201,6 +201,7 @@ export default function SignupPage() {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                <p className="mt-2 text-xs text-muted">Use at least 6 characters or more.</p>
               </div>
 
               {/* Confirm password */}
@@ -228,6 +229,7 @@ export default function SignupPage() {
                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                <p className="mt-2 text-xs text-muted">Use at least 6 characters or more.</p>
               </div>
 
               {errorMessage && (
@@ -251,7 +253,7 @@ export default function SignupPage() {
 
             <p className="mt-7 text-center text-sm text-muted">
               Already have an account?{' '}
-              <Link href="/login" className="font-semibold text-primary hover:underline">
+              <Link href="/signin" className="font-semibold text-primary hover:underline">
                 Sign in
               </Link>
             </p>

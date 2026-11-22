@@ -1,28 +1,75 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useState } from 'react';
-import { Menu, X, ArrowRight, LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, ChevronDown, LayoutDashboard, UserRound, LogOut } from 'lucide-react';
 
 import ThemeToggle from './ThemeToggle';
 import useAuth from '@/hooks/useAuth';
 import { signOut } from '@/lib/auth-client';
 
 const navLinks = [
-  { label: 'Find Tutors', href: '/tutors' },
-  { label: 'Find Tuition', href: '/tuitions' },
-  { label: 'How It Works', href: '/#how-it-works' },
+  { name: 'Home', href: '/' },
+  { name: 'Browse Tuitions', href: '/tuitions' },
+  { name: 'Pricing', href: '/pricing' },
 ];
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   const { user, isLoading, isAuthenticated, role } = useAuth();
-  const router = useRouter();
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const profileRef = useRef(null);
+
+  const dashboardHref = `/dashboard/${role || 'student'}`;
+
+  const initials = (user?.name || 'User')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
+
+  // Close profile dropdown when clicking outside or pressing Escape.
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setProfileOpen(false);
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
+
+  const closeMenus = () => {
+    setMobileMenuOpen(false);
+    setProfileOpen(false);
+  };
 
   const handleLogout = async () => {
     try {
+      setIsLoggingOut(true);
+
       const { error } = await signOut();
 
       if (error) {
@@ -30,115 +77,214 @@ export default function Navbar() {
         return;
       }
 
-      setIsOpen(false);
-      router.push('/signin');
+      closeMenus();
+      router.push('/');
       router.refresh();
     } catch (error) {
       console.error('Logout failed:', error.message);
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
-  const authActions = (
+  const isActiveLink = (href) => {
+    if (href === '/') return pathname === '/';
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  const renderLink = (link) => (
+    <Link
+      key={link.href}
+      href={link.href}
+      onClick={closeMenus}
+      className={`text-sm font-medium transition-colors hover:text-primary ${
+        isActiveLink(link.href) ? 'text-primary' : 'text-foreground/70'
+      }`}
+    >
+      {link.name}
+    </Link>
+  );
+
+  const ProfileAvatar = ({ size = 'h-9 w-9' }) =>
+    user?.image ? (
+      <img
+        src={user.image}
+        alt={user.name || 'User'}
+        className={`${size} shrink-0 rounded-full object-cover`}
+      />
+    ) : (
+      <span
+        className={`flex ${size} shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white`}
+      >
+        {initials || 'U'}
+      </span>
+    );
+
+  const ProfileOptions = () => (
     <>
-      {isLoading ? (
-        <div className="h-9 w-24 animate-pulse rounded-lg bg-surface" />
-      ) : isAuthenticated ? (
-        <div className="flex items-center gap-3">
-          <div className="hidden text-right sm:block">
-            <p className="text-sm font-semibold text-foreground">{user?.name || 'User'}</p>
-            <p className="text-xs capitalize text-muted">{role || 'Member'}</p>
-          </div>
+      <Link
+        href={dashboardHref}
+        onClick={closeMenus}
+        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition hover:bg-surface-secondary"
+      >
+        <LayoutDashboard size={17} />
+        Dashboard
+      </Link>
 
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition hover:border-red-500 hover:text-red-500"
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center gap-4">
-          <Link
-            href="/signin"
-            onClick={() => setIsOpen(false)}
-            className="text-sm font-semibold text-foreground transition hover:text-primary"
-          >
-            Log in
-          </Link>
+      <Link
+        href="/dashboard/profile"
+        onClick={closeMenus}
+        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition hover:bg-surface-secondary"
+      >
+        <UserRound size={17} />
+        My Profile
+      </Link>
 
-          <Link
-            href="/signup"
-            onClick={() => setIsOpen(false)}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
-          >
-            Get Started <ArrowRight size={16} />
-          </Link>
-        </div>
-      )}
+      <button
+        type="button"
+        onClick={handleLogout}
+        disabled={isLoggingOut}
+        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-red-500 transition hover:bg-surface-secondary disabled:opacity-50"
+      >
+        <LogOut size={17} />
+        {isLoggingOut ? 'Logging out...' : 'Logout'}
+      </button>
     </>
   );
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-xl">
-      <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold tracking-tight text-foreground">
+        <Link
+          href="/"
+          onClick={closeMenus}
+          className="inline-flex items-center gap-1 text-2xl font-bold tracking-tight text-foreground"
+        >
           Mentor<span className="text-primary">Lagbe</span>
-          <span className="ml-1 text-primary">.</span>
+          <span className="text-primary">.</span>
         </Link>
 
-        {/* Desktop navigation */}
-        <div className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="text-sm font-medium text-muted transition hover:text-primary"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
+        {/* Desktop Navigation */}
+        <div className="hidden items-center gap-7 md:flex">{navLinks.map(renderLink)}</div>
 
-        {/* Desktop actions */}
-        <div className="hidden items-center gap-4 md:flex">
+        {/* Right Side Actions */}
+        <div className="flex items-center gap-3">
+          {/* Theme Toggle */}
           <ThemeToggle />
-          {authActions}
-        </div>
 
-        {/* Mobile menu button */}
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          aria-expanded={isOpen}
-          className="rounded-lg p-2 text-foreground transition hover:bg-surface md:hidden"
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+          {/* Desktop Authentication */}
+          <div className="hidden items-center gap-3 sm:flex">
+            {isLoading ? (
+              <div className="h-10 w-28 animate-pulse rounded-full bg-surface" />
+            ) : isAuthenticated ? (
+              <div className="relative" ref={profileRef}>
+                <button
+                  type="button"
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  aria-expanded={profileOpen}
+                  aria-label="Open profile menu"
+                  className="flex items-center gap-2 rounded-full border border-border p-1 pr-3 transition hover:bg-surface-secondary"
+                >
+                  <ProfileAvatar />
+
+                  <span className="max-w-24 truncate text-sm font-medium text-foreground">
+                    {user?.name || 'Account'}
+                  </span>
+
+                  <ChevronDown
+                    size={16}
+                    className={`text-muted transition-transform ${profileOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+
+                {profileOpen && (
+                  <div className="absolute right-0 top-12 z-50 w-60 rounded-xl border border-border bg-background p-2 shadow-xl">
+                    <div className="border-b border-border px-3 py-3">
+                      <p className="truncate text-sm font-semibold text-foreground">
+                        {user?.name || 'User'}
+                      </p>
+                      <p className="truncate text-xs text-muted">{user?.email}</p>
+                      <p className="mt-1 text-xs capitalize text-primary">{role || 'Member'}</p>
+                    </div>
+
+                    <div className="space-y-1 pt-2">
+                      <ProfileOptions />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/signin"
+                  className="text-sm font-medium text-foreground transition hover:text-primary"
+                >
+                  Log in
+                </Link>
+
+                <Link
+                  href="/signup"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-foreground transition hover:bg-surface-secondary md:hidden"
+          >
+            {mobileMenuOpen ? <X size={21} /> : <Menu size={21} />}
+          </button>
+        </div>
       </nav>
 
-      {/* Mobile navigation */}
-      {isOpen && (
-        <div className="border-t border-border bg-background px-6 py-5 md:hidden">
-          <div className="flex flex-col gap-5">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                className="text-sm font-medium text-foreground transition hover:text-primary"
-              >
-                {link.label}
-              </Link>
-            ))}
+      {/* Mobile Navigation */}
+      {mobileMenuOpen && (
+        <div className="border-t border-border bg-background px-4 py-4 md:hidden">
+          <div className="mx-auto flex max-w-7xl flex-col gap-4">
+            {/* Navigation Links */}
+            {navLinks.map(renderLink)}
 
-            <div className="flex items-center justify-between border-t border-border pt-5">
-              <ThemeToggle />
-              {authActions}
-            </div>
+            {/* Mobile Authentication */}
+            {!isLoading && (
+              <>
+                {!isAuthenticated ? (
+                  <div className="flex items-center gap-4 border-t border-border pt-4">
+                    <Link
+                      href="/signin"
+                      onClick={closeMenus}
+                      className="text-sm font-medium text-foreground hover:text-primary"
+                    >
+                      Log in
+                    </Link>
+
+                    <Link
+                      href="/signup"
+                      onClick={closeMenus}
+                      className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white"
+                    >
+                      Get Started
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="border-t border-border pt-4">
+                    {/* Mobile Profile Options */}
+                    <div className="space-y-1">
+                      <ProfileOptions />
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       )}
