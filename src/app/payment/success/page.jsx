@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle2, ArrowRight, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, ArrowRight, ShieldCheck, ArrowLeft } from 'lucide-react';
 
 export default function PaymentSuccessPage() {
   return (
@@ -24,18 +24,10 @@ export default function PaymentSuccessPage() {
         </div>
 
         <Link
-          href="/dashboard"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
-        >
-          Go to Dashboard
-          <ArrowRight size={18} />
-        </Link>
-
-        <Link
           href="/"
-          className="mt-4 inline-block text-sm font-medium text-gray-500 transition hover:text-blue-600 dark:text-gray-400"
+          className="mt-4 inline-flex items-center text-sm justify-center gap-1 font-medium text-gray-500 transition hover:text-blue-600 dark:text-gray-400 hover:gap-3"
         >
-          Back to Home
+          <ArrowLeft size={18} /> Back to Home
         </Link>
       </div>
     </main>

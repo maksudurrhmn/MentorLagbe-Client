@@ -10,10 +10,8 @@ import {
   Clock3,
   CreditCard,
   Search,
-  Plus,
   BookOpen,
   Inbox,
-  XCircle,
   Crown,
   RefreshCw,
   LoaderCircle,
@@ -217,7 +215,7 @@ function StudentDashboardContent() {
               description={
                 stats.plan === 'pro' ? 'Enjoy your Pro membership' : 'Explore Pro membership'
               }
-              icon={CreditCard}
+              icon={Crown}
             />
           </div>
         </section>

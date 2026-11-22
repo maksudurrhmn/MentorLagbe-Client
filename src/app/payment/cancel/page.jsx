@@ -28,7 +28,7 @@ export default function PaymentCancelPage() {
 
         <Link
           href="/"
-          className="mt-4 inline-flex items-center justify-center gap-2 text-sm font-medium text-gray-500 transition hover:text-blue-600 dark:text-gray-400"
+          className="mt-4 inline-flex items-center justify-center gap-1 text-sm font-medium text-gray-500 transition hover:text-blue-600 dark:text-gray-400 hover:gap-3"
         >
           <ArrowLeft size={16} />
           Back to Home
