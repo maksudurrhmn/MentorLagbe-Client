@@ -14,9 +14,21 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '@/lib/api';
 
-const subjects = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Bangla', 'ICT'];
+const subjects = [
+  'Mathematics',
+  'Physics',
+  'Chemistry',
+  'Biology',
+  'English',
+  'Bangla',
+  'ICT',
+  'General Science',
+  'Computer Science',
+  'Physics & Chemistry',
+  'General Science & Mathematics',
+];
 
-const classLevels = ['Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'University'];
+const classLevels = ['Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'University', 'Others'];
 
 export default function TuitionsPage() {
   const [tuitions, setTuitions] = useState([]);
@@ -209,7 +221,7 @@ export default function TuitionsPage() {
             <button
               type="button"
               onClick={clearFilters}
-              className="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400"
+              className="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 cursor-pointer"
             >
               Clear Filters
             </button>
@@ -234,7 +246,7 @@ export default function TuitionsPage() {
             type="button"
             onClick={handleRefresh}
             disabled={isFetching}
-            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 hover:border-primary/40"
           >
             <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
             Refresh

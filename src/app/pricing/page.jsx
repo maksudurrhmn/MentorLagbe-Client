@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Check, Sparkles, ShieldCheck, LoaderCircle } from 'lucide-react';
+import { ArrowRight, Check, Sparkles, ShieldCheck, LoaderCircle, ArrowLeft } from 'lucide-react';
 import useAuth from '@/hooks/useAuth';
 import { apiRequest } from '@/lib/api';
 
@@ -272,9 +272,11 @@ export default function PricingPage() {
 
         {/* Footer Link */}
         <p className="mt-10 text-center text-sm text-muted">
-          Have questions?{' '}
-          <Link href="/" className="font-medium text-primary hover:underline">
-            Back to Home
+          <Link
+            href="/"
+            className="flex gap-1 items-center justify-center font-medium text-primary hover:gap-3"
+          >
+            <ArrowLeft size={18} /> Back to Home
           </Link>
         </p>
       </div>

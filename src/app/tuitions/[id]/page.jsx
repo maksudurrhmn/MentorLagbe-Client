@@ -143,7 +143,7 @@ export default function TuitionDetailsPage() {
       <div className="mx-auto max-w-6xl">
         <Link
           href="/tuitions"
-          className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-blue-600 dark:text-gray-400"
+          className="mb-8 inline-flex items-center gap-1 text-sm font-semibold text-gray-500 transition hover:text-blue-600 dark:text-gray-400 hover:gap-3"
         >
           <ArrowLeft size={17} />
           Back to Tuitions
@@ -262,7 +262,7 @@ export default function TuitionDetailsPage() {
                 <input
                   id="studentPhone"
                   name="studentPhone"
-                  type="tel"
+                  type="number"
                   required
                   value={formData.studentPhone}
                   onChange={handleChange}
