@@ -13,7 +13,9 @@ import {
   Mail,
   LockKeyhole,
   ArrowRight,
+  ArrowLeft,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -57,6 +59,7 @@ export default function SignupPage() {
 
       router.push('/');
       router.refresh();
+      toast.success('Account created successfully!');
     } catch (error) {
       setErrorMessage(error.message || 'Something went wrong. Please try again.');
     } finally {
@@ -99,8 +102,11 @@ export default function SignupPage() {
         {/* Signup form */}
         <div className="p-6 sm:p-10">
           <div className="mx-auto max-w-md">
-            <Link href="/" className="text-sm font-medium text-muted transition hover:text-primary">
-              ← Back to home
+            <Link
+              href="/"
+              className="flex items-center gap-1 text-sm font-medium text-muted transition hover:text-primary hover:gap-3"
+            >
+              <ArrowLeft size={18} /> Back to home
             </Link>
 
             <h2 className="mt-8 text-3xl font-bold">Create your account</h2>

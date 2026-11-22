@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, GraduationCap, Mail, LockKeyhole, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, GraduationCap, Mail, LockKeyhole, ArrowRight, ArrowLeft } from 'lucide-react';
 import { signIn } from '@/lib/auth-client';
 
 export default function LoginPage() {
@@ -77,8 +77,11 @@ export default function LoginPage() {
         {/* Login form */}
         <div className="flex items-center justify-center p-6 sm:p-10 lg:p-12">
           <div className="mx-auto w-full max-w-md">
-            <Link href="/" className="text-sm font-medium text-muted transition hover:text-primary">
-              ← Back to home
+            <Link
+              href="/"
+              className="flex items-center gap-1 text-sm font-medium text-muted transition hover:text-primary hover:gap-3"
+            >
+              <ArrowLeft size={18} /> Back to home
             </Link>
 
             <h2 className="mt-6 text-3xl font-bold">Welcome back</h2>

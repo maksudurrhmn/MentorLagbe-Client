@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from 'next/font/google';
 import AppShell from '@/components/shared/AppShell';
 import ThemeProvider from '@/components/shared/ThemeProvider';
+import ToastProvider from '@/components/shared/ToastProvider';
 import './globals.css';
 
 const geistSans = Geist({
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
+          <ToastProvider />
           <AppShell>{children}</AppShell>
         </ThemeProvider>
       </body>
