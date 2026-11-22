@@ -3,7 +3,15 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, ChevronDown, LayoutDashboard, UserRound, LogOut } from 'lucide-react';
+import {
+  Menu,
+  X,
+  ChevronDown,
+  LayoutDashboard,
+  UserRound,
+  LogOut,
+  GraduationCap,
+} from 'lucide-react';
 
 import ThemeToggle from './ThemeToggle';
 import useAuth from '@/hooks/useAuth';
@@ -162,6 +170,9 @@ export default function Navbar() {
           onClick={closeMenus}
           className="inline-flex items-center gap-1 text-2xl font-bold tracking-tight text-foreground"
         >
+          <span className="rounded-xl bg-primary p-2 text-white">
+            <GraduationCap size={18} />
+          </span>
           Mentor<span className="text-primary">Lagbe</span>
           <span className="text-primary">.</span>
         </Link>

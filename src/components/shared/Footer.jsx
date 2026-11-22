@@ -29,15 +29,11 @@ export default function Footer() {
             <h3 className="font-semibold text-foreground">Explore</h3>
 
             <div className="mt-4 flex flex-col gap-3 text-sm text-muted">
-              <Link href="/tutors" className="transition hover:text-primary">
-                Find Tutors
-              </Link>
-
               <Link href="/tuitions" className="transition hover:text-primary">
-                Find Tuition
+                Exprole Tuition
               </Link>
 
-              <Link href="/register" className="transition hover:text-primary">
+              <Link href="/signup" className="transition hover:text-primary">
                 Join MentorLagbe
               </Link>
             </div>

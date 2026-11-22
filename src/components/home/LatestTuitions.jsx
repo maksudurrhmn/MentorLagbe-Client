@@ -20,7 +20,7 @@ export default function LatestTuitions() {
           auth: false,
         });
 
-        setTuitions((response.data || []).slice(0, 3));
+        setTuitions((response.data || []).slice(0, 6));
       } catch (err) {
         setError(err.message || 'Unable to load tuition posts.');
       } finally {
@@ -61,7 +61,7 @@ export default function LatestTuitions() {
 
         {loading && (
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {[1, 2, 3].map((item) => (
+            {[1, 2, 3, 4, 5, 6].map((item) => (
               <div
                 key={item}
                 className="animate-pulse overflow-hidden rounded-2xl border border-border bg-surface"
