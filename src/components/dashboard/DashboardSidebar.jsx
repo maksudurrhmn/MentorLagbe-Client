@@ -54,16 +54,6 @@ const navigation = {
       icon: LayoutDashboard,
     },
     {
-      label: 'Find Tuitions',
-      href: '/tuitions',
-      icon: Search,
-    },
-    {
-      label: 'Post New Tuition',
-      href: '/dashboard/tutor/tuitions/new',
-      icon: PlusCircle,
-    },
-    {
       label: 'My Tuitions',
       href: '/dashboard/tutor/tuitions',
       icon: BookOpen,

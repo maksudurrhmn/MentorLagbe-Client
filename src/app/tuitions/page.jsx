@@ -20,48 +20,99 @@ const classLevels = ['Class 1-5', 'Class 6-8', 'Class 9-10', 'Class 11-12', 'Uni
 
 export default function TuitionsPage() {
   const [tuitions, setTuitions] = useState([]);
+
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState('');
 
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [subject, setSubject] = useState('');
   const [classLevel, setClassLevel] = useState('');
   const [mode, setMode] = useState('');
 
-  const fetchTuitions = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError('');
+  const [refreshKey, setRefreshKey] = useState(0);
 
-      const params = new URLSearchParams();
-
-      if (search.trim()) params.set('search', search.trim());
-      if (subject) params.set('subject', subject);
-      if (classLevel) params.set('classLevel', classLevel);
-      if (mode) params.set('mode', mode);
-
-      const queryString = params.toString();
-      const endpoint = `/api/tuitions${queryString ? `?${queryString}` : ''}`;
-
-      const response = await apiRequest(endpoint, { auth: false });
-
-      setTuitions(response.data || []);
-    } catch (err) {
-      setError(err.message || 'Failed to load tuition posts.');
-    } finally {
-      setLoading(false);
-    }
-  }, [search, subject, classLevel, mode]);
-
+  // Debounce search input
   useEffect(() => {
-    fetchTuitions();
-  }, [fetchTuitions]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 400);
 
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Fetch tuition posts
+  const fetchTuitions = useCallback(
+    async (signal) => {
+      try {
+        setIsFetching(true);
+        setError('');
+
+        const params = new URLSearchParams();
+
+        if (debouncedSearch) {
+          params.set('search', debouncedSearch);
+        }
+
+        if (subject) {
+          params.set('subject', subject);
+        }
+
+        if (classLevel) {
+          params.set('classLevel', classLevel);
+        }
+
+        if (mode) {
+          params.set('mode', mode);
+        }
+
+        const queryString = params.toString();
+
+        const endpoint = `/api/tuitions${queryString ? `?${queryString}` : ''}`;
+
+        const response = await apiRequest(endpoint, {
+          auth: false,
+          signal,
+        });
+
+        setTuitions(response.data || []);
+      } catch (err) {
+        if (signal?.aborted) return;
+
+        setError(err.message || 'Failed to load tuition posts.');
+      } finally {
+        if (!signal?.aborted) {
+          setIsFetching(false);
+          setLoading(false);
+        }
+      }
+    },
+    [debouncedSearch, subject, classLevel, mode]
+  );
+
+  // Fetch whenever filters change
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetchTuitions(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
+  }, [fetchTuitions, refreshKey]);
+
+  // Clear all filters
   const clearFilters = () => {
     setSearch('');
     setSubject('');
     setClassLevel('');
     setMode('');
+  };
+
+  // Refresh tuition posts
+  const handleRefresh = () => {
+    setRefreshKey((current) => current + 1);
   };
 
   return (
@@ -92,11 +143,13 @@ export default function TuitionsPage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* Search */}
             <div className="relative lg:col-span-1">
               <Search
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
+
               <input
                 type="search"
                 value={search}
@@ -106,12 +159,14 @@ export default function TuitionsPage() {
               />
             </div>
 
+            {/* Subject */}
             <select
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             >
               <option value="">All Subjects</option>
+
               {subjects.map((item) => (
                 <option key={item} value={item}>
                   {item}
@@ -119,12 +174,14 @@ export default function TuitionsPage() {
               ))}
             </select>
 
+            {/* Class Level */}
             <select
               value={classLevel}
               onChange={(e) => setClassLevel(e.target.value)}
               className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             >
               <option value="">All Class Levels</option>
+
               {classLevels.map((item) => (
                 <option key={item} value={item}>
                   {item}
@@ -132,6 +189,7 @@ export default function TuitionsPage() {
               ))}
             </select>
 
+            {/* Mode */}
             <select
               value={mode}
               onChange={(e) => setMode(e.target.value)}
@@ -162,18 +220,23 @@ export default function TuitionsPage() {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Available Tuitions</h2>
+
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {loading ? 'Loading opportunities...' : `${tuitions.length} opportunities found`}
+              {loading
+                ? 'Loading opportunities...'
+                : isFetching
+                  ? 'Updating results...'
+                  : `${tuitions.length} opportunities found`}
             </p>
           </div>
 
           <button
             type="button"
-            onClick={fetchTuitions}
-            disabled={loading}
+            onClick={handleRefresh}
+            disabled={isFetching}
             className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
             Refresh
           </button>
         </div>
@@ -182,13 +245,14 @@ export default function TuitionsPage() {
         {error && (
           <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400">
             <p>{error}</p>
-            <button onClick={fetchTuitions} className="mt-2 font-semibold underline">
+
+            <button type="button" onClick={handleRefresh} className="mt-2 font-semibold underline">
               Try again
             </button>
           </div>
         )}
 
-        {/* Loading Skeleton */}
+        {/* Initial Loading Skeleton */}
         {loading && (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
@@ -197,6 +261,7 @@ export default function TuitionsPage() {
                 className="animate-pulse overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
               >
                 <div className="h-48 bg-gray-200 dark:bg-gray-800" />
+
                 <div className="space-y-4 p-5">
                   <div className="h-5 w-3/4 rounded bg-gray-200 dark:bg-gray-800" />
                   <div className="h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-800" />
@@ -216,11 +281,14 @@ export default function TuitionsPage() {
                 key={tuition._id}
                 className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
               >
+                {/* Banner */}
                 <div className="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-800">
                   {tuition.bannerImage ? (
                     <img
                       src={tuition.bannerImage}
-                      alt={tuition.title}
+                      alt={tuition.title || 'Tuition banner'}
+                      loading="lazy"
+                      decoding="async"
                       className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                   ) : (
@@ -234,11 +302,13 @@ export default function TuitionsPage() {
                   </span>
                 </div>
 
+                {/* Card Content */}
                 <div className="flex flex-1 flex-col p-5">
                   <div className="mb-3 flex flex-wrap gap-2 text-xs font-medium">
                     <span className="rounded-lg bg-blue-50 px-2.5 py-1 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
                       {tuition.mode}
                     </span>
+
                     <span className="rounded-lg bg-gray-100 px-2.5 py-1 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
                       {tuition.classLevel}
                     </span>
@@ -252,10 +322,11 @@ export default function TuitionsPage() {
                     {tuition.description}
                   </p>
 
+                  {/* Tuition Information */}
                   <div className="mb-5 mt-auto space-y-2 border-t border-gray-100 pt-4 text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
                     <div className="flex items-center gap-2">
                       <GraduationCap size={16} />
-                      <span>{tuition.tutorName}</span>
+                      <span>{tuition.tutorName || 'Unknown tutor'}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -265,15 +336,17 @@ export default function TuitionsPage() {
 
                     <div className="flex items-center gap-2">
                       <Clock size={16} />
-                      <span>{tuition.daysPerWeek} days per week</span>
+                      <span>{tuition.daysPerWeek || '—'} days per week</span>
                     </div>
                   </div>
 
+                  {/* Fee and Details */}
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Monthly Fee</p>
+
                       <p className="text-xl font-bold text-gray-900 dark:text-white">
-                        ৳{Number(tuition.monthlyFee).toLocaleString('en-BD')}
+                        ৳{Number(tuition.monthlyFee || 0).toLocaleString('en-BD')}
                       </p>
                     </div>
 
@@ -308,6 +381,7 @@ export default function TuitionsPage() {
             </p>
 
             <button
+              type="button"
               onClick={clearFilters}
               className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
             >

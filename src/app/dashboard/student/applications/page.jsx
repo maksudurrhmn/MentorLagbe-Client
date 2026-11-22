@@ -23,29 +23,66 @@ const statusStyles = {
   rejected: 'bg-red-500/10 text-red-500 border-red-500/20',
 };
 
+const formatDate = (date) => {
+  if (!date) return 'Not available';
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) return 'Not available';
+
+  return parsedDate.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+
 export default function StudentApplicationsPage() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [cancelingId, setCancelingId] = useState(null);
 
+  // Fetch applications and support manual refresh.
   const fetchApplications = useCallback(async () => {
     try {
       setError('');
 
-      const result = await apiRequest('/api/applications/my');
-      setApplications(result.data || []);
+      // Preserve existing cards while refreshing.
+      if (applications.length === 0) {
+        setLoading(true);
+      }
+
+      setRefreshing(true);
+
+      const result = await apiRequest('/api/applications/my', {
+        cache: 'no-store',
+      });
+
+      // Support both array and nested API response formats.
+      const payload = result?.data ?? result;
+
+      const applicationList = Array.isArray(payload) ? payload : payload?.applications;
+
+      if (!Array.isArray(applicationList)) {
+        throw new Error('Invalid applications response.');
+      }
+
+      setApplications(applicationList);
     } catch (err) {
       setError(err.message || 'Failed to load applications.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  }, []);
+  }, [applications.length]);
 
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
 
+  // Cancel a pending application.
   const handleCancel = async (applicationId) => {
     const confirmed = window.confirm('Are you sure you want to cancel this application?');
 
@@ -53,6 +90,7 @@ export default function StudentApplicationsPage() {
 
     try {
       setCancelingId(applicationId);
+      setError('');
 
       await apiRequest(`/api/applications/${applicationId}`, {
         method: 'DELETE',
@@ -111,12 +149,15 @@ export default function StudentApplicationsPage() {
           </div>
 
           <button
+            type="button"
             onClick={fetchApplications}
-            disabled={loading}
+            disabled={loading || refreshing}
+            title="Refresh applications"
+            aria-label="Refresh applications"
             className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-            Refresh
+            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+            {refreshing ? 'Refresh' : 'Refresh'}
           </button>
         </section>
 
@@ -174,24 +215,45 @@ export default function StudentApplicationsPage() {
             )}
           </div>
 
-          {/* Error State */}
+          {/* Error Message */}
           {error && (
             <div className="mb-4 flex flex-col gap-3 rounded-xl border border-red-500/20 bg-red-500/5 p-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-red-500">{error}</p>
 
               <button
+                type="button"
                 onClick={fetchApplications}
-                className="text-left text-sm font-semibold text-primary hover:underline sm:text-right"
+                disabled={loading || refreshing}
+                className="shrink-0 text-left text-sm font-semibold text-primary hover:underline disabled:opacity-50 sm:text-right"
               >
                 Try again
               </button>
             </div>
           )}
 
-          {/* Loading State */}
+          {/* Initial Loading */}
           {loading ? (
             <div className="flex min-h-64 items-center justify-center rounded-xl border border-border bg-surface">
               <LoaderCircle size={30} className="animate-spin text-primary" />
+            </div>
+          ) : applications.length === 0 && error ? (
+            /* Failed Initial Loading */
+            <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border border-border bg-surface px-4 py-10 text-center">
+              <XCircle size={30} className="text-red-500" />
+
+              <h3 className="mt-4 font-semibold text-foreground">Couldn't load applications</h3>
+
+              <p className="mt-2 text-sm text-muted">Please check your connection and try again.</p>
+
+              <button
+                type="button"
+                onClick={fetchApplications}
+                disabled={refreshing}
+                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              >
+                <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+                Try again
+              </button>
             </div>
           ) : applications.length === 0 ? (
             /* Empty State */
@@ -209,7 +271,7 @@ export default function StudentApplicationsPage() {
 
               <Link
                 href="/tuitions"
-                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 Explore Tuitions
                 <ArrowRight size={16} />
@@ -218,85 +280,97 @@ export default function StudentApplicationsPage() {
           ) : (
             /* Application Cards */
             <div className="grid gap-4">
-              {applications.map((application) => (
-                <article
-                  key={application._id}
-                  className="rounded-xl border border-border bg-surface p-5 transition-colors hover:border-primary/40 sm:p-6"
-                >
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
-                      <h3 className="text-lg font-semibold text-foreground">
-                        {application.tuitionTitle}
-                      </h3>
+              {applications.map((application) => {
+                const isCanceling = cancelingId === application._id;
 
-                      <p className="mt-1 text-sm text-muted">{application.subject}</p>
-                    </div>
-
-                    <span
-                      className={`w-fit rounded-full border px-3 py-1 text-xs font-semibold capitalize ${
-                        statusStyles[application.status] || 'border-border bg-background text-muted'
-                      }`}
-                    >
-                      {application.status}
-                    </span>
-                  </div>
-
-                  <div className="mt-5 grid grid-cols-1 gap-4 border-t border-border pt-5 sm:grid-cols-2 xl:grid-cols-3">
-                    <div className="flex items-start gap-3">
-                      <GraduationCap size={18} className="mt-0.5 shrink-0 text-muted" />
-
+                return (
+                  <article
+                    key={application._id}
+                    className="rounded-xl border border-border bg-surface p-5 transition-colors hover:border-primary/40 sm:p-6"
+                  >
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
-                        <p className="text-xs text-muted">Tutor</p>
-                        <p className="mt-1 break-all text-sm font-medium text-foreground">
-                          {application.tutorEmail || 'Not available'}
+                        <h3 className="text-lg font-semibold text-foreground">
+                          {application.tuitionTitle || 'Untitled Tuition'}
+                        </h3>
+
+                        <p className="mt-1 text-sm text-muted">
+                          {application.subject || 'Subject not specified'}
                         </p>
                       </div>
-                    </div>
 
-                    <div className="flex items-start gap-3">
-                      <ClipboardList size={18} className="mt-0.5 shrink-0 text-muted" />
-
-                      <div>
-                        <p className="text-xs text-muted">Monthly Fee</p>
-                        <p className="mt-1 text-sm font-medium text-foreground">
-                          ৳{application.monthlyFee}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <CalendarDays size={18} className="mt-0.5 shrink-0 text-muted" />
-
-                      <div>
-                        <p className="text-xs text-muted">Applied On</p>
-                        <p className="mt-1 text-sm font-medium text-foreground">
-                          {application.appliedAt
-                            ? new Date(application.appliedAt).toLocaleDateString()
-                            : 'Not available'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {application.status === 'pending' && (
-                    <div className="mt-5 flex justify-end border-t border-border pt-4">
-                      <button
-                        onClick={() => handleCancel(application._id)}
-                        disabled={cancelingId === application._id}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-500/20 px-4 py-2.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/5 disabled:cursor-not-allowed disabled:opacity-50"
+                      <span
+                        className={`w-fit rounded-full border px-3 py-1 text-xs font-semibold capitalize ${
+                          statusStyles[application.status] ||
+                          'border-border bg-background text-muted'
+                        }`}
                       >
-                        {cancelingId === application._id ? (
-                          <LoaderCircle size={16} className="animate-spin" />
-                        ) : (
-                          <Trash2 size={16} />
-                        )}
-
-                        {cancelingId === application._id ? 'Canceling...' : 'Cancel Application'}
-                      </button>
+                        {application.status || 'Unknown'}
+                      </span>
                     </div>
-                  )}
-                </article>
-              ))}
+
+                    <div className="mt-5 grid grid-cols-1 gap-4 border-t border-border pt-5 sm:grid-cols-2 xl:grid-cols-3">
+                      <div className="flex items-start gap-3">
+                        <GraduationCap size={18} className="mt-0.5 shrink-0 text-muted" />
+
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted">Tutor</p>
+
+                          <p className="mt-1 break-all text-sm font-medium text-foreground">
+                            {application.tutorEmail || 'Not available'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <ClipboardList size={18} className="mt-0.5 shrink-0 text-muted" />
+
+                        <div>
+                          <p className="text-xs text-muted">Monthly Fee</p>
+
+                          <p className="mt-1 text-sm font-medium text-foreground">
+                            {application.monthlyFee != null
+                              ? `৳${application.monthlyFee}`
+                              : 'Not available'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <CalendarDays size={18} className="mt-0.5 shrink-0 text-muted" />
+
+                        <div>
+                          <p className="text-xs text-muted">Applied On</p>
+
+                          <p className="mt-1 text-sm font-medium text-foreground">
+                            {formatDate(application.appliedAt)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Cancel Application */}
+                    {application.status === 'pending' && (
+                      <div className="mt-5 flex justify-end border-t border-border pt-4">
+                        <button
+                          type="button"
+                          onClick={() => handleCancel(application._id)}
+                          disabled={cancelingId !== null}
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-500/20 px-4 py-2.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/5 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {isCanceling ? (
+                            <LoaderCircle size={16} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={16} />
+                          )}
+
+                          {isCanceling ? 'Canceling...' : 'Cancel Application'}
+                        </button>
+                      </div>
+                    )}
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>

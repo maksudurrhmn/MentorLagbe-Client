@@ -12,9 +12,7 @@ import {
   Crown,
   Plus,
   ArrowRight,
-  Clock,
   CheckCircle2,
-  XCircle,
   RefreshCw,
   LoaderCircle,
   Inbox,
@@ -130,7 +128,7 @@ function TutorDashboardContent() {
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
           >
             <Plus size={18} />
-            Post a Tuition
+            Post Tuition
           </Link>
         </section>
 
@@ -287,7 +285,7 @@ function TutorDashboardContent() {
                   <Plus size={19} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-foreground">Post New Tuition</p>
+                  <p className="text-sm font-semibold text-foreground">Post Tuition</p>
                   <p className="mt-1 text-xs text-muted">Create a new tuition listing</p>
                 </div>
                 <ArrowRight size={16} className="text-muted" />

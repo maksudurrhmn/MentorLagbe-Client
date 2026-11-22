@@ -126,10 +126,10 @@ export default function MyTuitionsPage() {
 
           <Link
             href="/dashboard/tutor/tuitions/new"
-            className="inline-flex items-center justify-center gap-2 self-start rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:self-auto"
+            className="inline-flex items-center justify-center gap-2 self-start rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:self-auto"
           >
             <Plus size={18} />
-            Post New Tuition
+            Post Tuition
           </Link>
         </section>
 
@@ -229,7 +229,7 @@ export default function MyTuitionsPage() {
                   onClick={() => setFilter(status)}
                   className={`rounded-lg border px-4 py-2 text-sm font-medium capitalize transition-colors ${
                     filter === status
-                      ? 'border-primary bg-primary text-primary-foreground'
+                      ? 'border-primary bg-primary text-white'
                       : 'border-border bg-surface text-muted hover:border-primary/40 hover:text-foreground'
                   }`}
                 >

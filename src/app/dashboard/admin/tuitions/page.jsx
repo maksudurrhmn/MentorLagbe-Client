@@ -69,6 +69,7 @@ export default function AdminTuitionsPage() {
   const [updatingId, setUpdatingId] = useState(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [confirmation, setConfirmation] = useState(null);
 
   const fetchTuitions = useCallback(async () => {
     try {
@@ -122,12 +123,17 @@ export default function AdminTuitionsPage() {
     });
   }, [tuitions, activeFilter, search]);
 
-  const handleApproval = async (tuition, nextStatus) => {
-    const action = nextStatus === 'approved' ? 'approve' : 'reject';
+  const handleApproval = (tuition, nextStatus) => {
+    setConfirmation({
+      tuition,
+      nextStatus,
+    });
+  };
 
-    const confirmed = window.confirm(`Are you sure you want to ${action} "${tuition.title}"?`);
+  const confirmApproval = async () => {
+    if (!confirmation) return;
 
-    if (!confirmed) return;
+    const { tuition, nextStatus } = confirmation;
 
     try {
       setUpdatingId(tuition._id);
@@ -146,6 +152,7 @@ export default function AdminTuitionsPage() {
       );
 
       setNotice(`Tuition post ${nextStatus} successfully.`);
+      setConfirmation(null);
     } catch (err) {
       setError(err.message || 'Failed to update tuition status.');
     } finally {
@@ -298,14 +305,14 @@ export default function AdminTuitionsPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 items-stretch gap-5 xl:grid-cols-2">
+            <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-2 2xl:grid-cols-3">
               {filteredTuitions.map((tuition) => (
                 <article
                   key={tuition._id}
                   className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-primary/30"
                 >
                   {/* Banner */}
-                  <div className="h-44 shrink-0 overflow-hidden bg-background">
+                  <div className="h-36 shrink-0 overflow-hidden bg-background">
                     {tuition.bannerImage ? (
                       <img
                         src={tuition.bannerImage}
@@ -314,27 +321,25 @@ export default function AdminTuitionsPage() {
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center">
-                        <BookOpen size={36} className="text-muted/40" />
+                        <BookOpen size={32} className="text-muted/40" />
                       </div>
                     )}
                   </div>
 
-                  {/* Card Content */}
-                  <div className="flex flex-1 flex-col gap-5 p-5 sm:p-6">
+                  <div className="flex flex-1 flex-col gap-4 p-5">
                     {/* Title and Status */}
-                    <div className="flex min-h-16 items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <h3 className="line-clamp-2 text-base font-semibold leading-6 text-foreground sm:text-lg">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="line-clamp-2 text-base font-semibold leading-6 text-foreground">
                           {tuition.title}
                         </h3>
-
                         <p className="mt-1 text-sm text-muted">
                           {tuition.subject} · {tuition.classLevel}
                         </p>
                       </div>
 
                       <span
-                        className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium capitalize ${
+                        className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${
                           statusStyles[tuition.approvalStatus] ||
                           'border-border bg-background text-muted'
                         }`}
@@ -343,8 +348,8 @@ export default function AdminTuitionsPage() {
                       </span>
                     </div>
 
-                    {/* Tuition Details */}
-                    <div className="grid grid-cols-2 gap-4 rounded-lg bg-background p-4">
+                    {/* Fee and Mode */}
+                    <div className="flex items-center justify-between rounded-lg bg-background px-4 py-3">
                       <div>
                         <p className="text-xs text-muted">Monthly Fee</p>
                         <p className="mt-1 font-semibold text-foreground">
@@ -352,99 +357,71 @@ export default function AdminTuitionsPage() {
                         </p>
                       </div>
 
-                      <div>
-                        <p className="text-xs text-muted">Days per Week</p>
-                        <p className="mt-1 font-semibold text-foreground">
-                          {tuition.daysPerWeek || '—'} days
-                        </p>
-                      </div>
-
-                      <div>
+                      <div className="text-right">
                         <p className="text-xs text-muted">Mode</p>
-                        <p className="mt-1 font-semibold text-foreground">{tuition.mode || '—'}</p>
-                      </div>
-
-                      <div>
-                        <p className="text-xs text-muted">Availability</p>
-                        <p className="mt-1 font-semibold text-foreground">
-                          {tuition.isActive ? 'Active' : 'Inactive'}
+                        <p className="mt-1 font-semibold capitalize text-foreground">
+                          {tuition.mode || '—'}
                         </p>
                       </div>
                     </div>
 
-                    {/* Tutor Information */}
-                    <div className="space-y-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                        Tutor Information
-                      </p>
+                    {/* Tutor */}
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <Users size={17} />
+                      </div>
 
-                      <div className="flex min-h-12 items-center gap-3">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <Users size={18} />
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-foreground">
-                            {tuition.tutorName || 'Unknown tutor'}
-                          </p>
-
-                          <p className="truncate text-xs text-muted">
-                            {tuition.tutorEmail || 'No email available'}
-                          </p>
-                        </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {tuition.tutorName || 'Unknown tutor'}
+                        </p>
+                        <p className="truncate text-xs text-muted">
+                          {tuition.tutorEmail || 'No email available'}
+                        </p>
                       </div>
                     </div>
 
-                    {/* Location and Date */}
-                    <div className="flex min-h-8 flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted">
+                    {/* Location and Posted Date */}
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted">
                       {tuition.location && (
                         <span className="inline-flex items-center gap-1.5">
-                          <MapPin size={14} className="shrink-0" />
+                          <MapPin size={14} />
                           {tuition.location}
                         </span>
                       )}
 
                       <span className="inline-flex items-center gap-1.5">
-                        <CalendarDays size={14} className="shrink-0" />
-                        Posted {formatDate(tuition.createdAt)}
+                        <CalendarDays size={14} />
+                        {formatDate(tuition.createdAt)}
                       </span>
-                    </div>
-
-                    {/* Description */}
-                    <div className="min-h-18">
-                      {tuition.description && (
-                        <p className="line-clamp-3 text-sm leading-6 text-muted">
-                          {tuition.description}
-                        </p>
-                      )}
                     </div>
 
                     {/* Moderation Actions */}
                     <div className="mt-auto border-t border-border pt-4">
                       {tuition.approvalStatus === 'pending' ? (
-                        <div className="flex flex-col gap-3 sm:flex-row">
+                        <div className="flex gap-3">
                           <button
                             type="button"
                             onClick={() => handleApproval(tuition, 'approved')}
                             disabled={updatingId === tuition._id}
-                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             <CheckCircle2 size={16} />
-                            {updatingId === tuition._id ? 'Updating...' : 'Approve'}
+                            Approve
                           </button>
 
                           <button
                             type="button"
                             onClick={() => handleApproval(tuition, 'rejected')}
                             disabled={updatingId === tuition._id}
-                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-red-500/30 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-red-500/30 px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             <XCircle size={16} />
                             Reject
                           </button>
                         </div>
                       ) : (
-                        <p className="py-2 text-center text-xs text-muted">
+                        <p className="py-1 text-center text-xs text-muted">
                           This tuition post has already been reviewed.
                         </p>
                       )}
@@ -455,6 +432,87 @@ export default function AdminTuitionsPage() {
             </div>
           )}
         </section>
+        {/* Approval Confirmation Modal */}
+        {confirmation && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 backdrop-blur-sm">
+            <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-2xl">
+              <div
+                className={`mx-auto flex size-14 items-center justify-center rounded-full ${
+                  confirmation.nextStatus === 'approved'
+                    ? 'bg-emerald-500/10 text-emerald-600'
+                    : 'bg-red-500/10 text-red-500'
+                }`}
+              >
+                {confirmation.nextStatus === 'approved' ? (
+                  <CheckCircle2 size={27} />
+                ) : (
+                  <XCircle size={27} />
+                )}
+              </div>
+
+              <div className="mt-4 text-center">
+                <h2 className="text-lg font-bold text-foreground">
+                  {confirmation.nextStatus === 'approved'
+                    ? 'Approve Tuition Post?'
+                    : 'Reject Tuition Post?'}
+                </h2>
+
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  Are you sure you want to{' '}
+                  <span
+                    className={`font-semibold ${
+                      confirmation.nextStatus === 'approved' ? 'text-emerald-600' : 'text-red-500'
+                    }`}
+                  >
+                    {confirmation.nextStatus}
+                  </span>{' '}
+                  the tuition post{' '}
+                  <span className="font-semibold text-foreground">
+                    "{confirmation.tuition.title}"
+                  </span>
+                  ?
+                </p>
+
+                <p className="mt-2 text-xs text-muted">
+                  This action will update the tuition post's approval status.
+                </p>
+              </div>
+
+              <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => setConfirmation(null)}
+                  disabled={updatingId !== null}
+                  className="flex-1 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-background disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={confirmApproval}
+                  disabled={updatingId !== null}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                    confirmation.nextStatus === 'approved'
+                      ? 'bg-emerald-600 hover:bg-emerald-700'
+                      : 'bg-red-600 hover:bg-red-700'
+                  }`}
+                >
+                  {updatingId !== null ? (
+                    <>
+                      <RefreshCw size={16} className="animate-spin" />
+                      Processing...
+                    </>
+                  ) : confirmation.nextStatus === 'approved' ? (
+                    'Yes, Approve'
+                  ) : (
+                    'Yes, Reject'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

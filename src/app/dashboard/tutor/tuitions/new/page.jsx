@@ -77,7 +77,14 @@ export default function CreateTuitionPage() {
     setError('');
     setSuccess('');
     setImageFile(file);
-    setPreview(URL.createObjectURL(file));
+
+    setPreview((previousPreview) => {
+      if (previousPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(previousPreview);
+      }
+
+      return URL.createObjectURL(file);
+    });
   };
 
   const handleSubmit = async (e) => {

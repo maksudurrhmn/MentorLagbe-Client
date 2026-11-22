@@ -218,7 +218,7 @@ function AdminDashboardContent() {
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition hover:bg-background disabled:opacity-50"
           >
             <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
-            Refresh Overview
+            Refresh
           </button>
         </section>
 

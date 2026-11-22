@@ -66,6 +66,21 @@ export default function DashboardHeader({ onMenuClick }) {
     }
   };
 
+  const ProfileAvatar = ({ size = 'h-9 w-9' }) =>
+    user?.image ? (
+      <img
+        src={user.image}
+        alt={user.name || 'User'}
+        className={`${size} shrink-0 rounded-full object-cover`}
+      />
+    ) : (
+      <span
+        className={`flex ${size} shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white`}
+      >
+        {initials || 'U'}
+      </span>
+    );
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/85 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
       {/* Left: Menu and Page Title */}
@@ -101,7 +116,7 @@ export default function DashboardHeader({ onMenuClick }) {
         {/* User Information */}
         <div className="hidden items-center gap-2.5 border-l border-border pl-3 sm:flex">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary ring-1 ring-primary/15">
-            {initials || <UserRound size={17} />}
+            <ProfileAvatar />
           </div>
 
           <div className="hidden min-w-0 md:block">

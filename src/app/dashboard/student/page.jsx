@@ -194,10 +194,10 @@ function StudentDashboardContent() {
             <button
               onClick={fetchDashboardData}
               disabled={loading}
-              title="Refresh dashboard"
-              className="rounded-lg border border-border bg-surface p-2 text-muted transition hover:text-foreground disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition hover:bg-background disabled:opacity-50"
             >
-              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+              <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
+              Refresh
             </button>
           </div>
 
