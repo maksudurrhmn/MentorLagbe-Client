@@ -385,7 +385,7 @@ export default function MyTuitionsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="mt-auto flex flex-wrap gap-2 border-t border-border pt-4 mt-5">
+                    <div className="mt-auto flex flex-wrap gap-2 border-t border-border pt-4">
                       <button
                         type="button"
                         onClick={() => handleToggleStatus(tuition)}

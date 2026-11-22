@@ -46,7 +46,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="mt-12 flex flex-col justify-between gap-3 border-t border-border pt-6 text-sm text-muted sm:flex-row">
-          <p>© {new Date().getFullYear()} MentorLagbe. All rights reserved.</p>
+          <p>©2026 MentorLagbe. All rights reserved.</p>
 
           <p>Built to connect, teach, and grow.</p>
         </div>

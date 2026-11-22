@@ -411,7 +411,7 @@ export default function AdminTuitionsPage() {
                     </div>
 
                     {/* Description */}
-                    <div className="min-h-[4.5rem]">
+                    <div className="min-h-18">
                       {tuition.description && (
                         <p className="line-clamp-3 text-sm leading-6 text-muted">
                           {tuition.description}

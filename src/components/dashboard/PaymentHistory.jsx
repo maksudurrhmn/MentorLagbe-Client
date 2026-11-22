@@ -208,7 +208,7 @@ export default function PaymentHistory({ role }) {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[750px] text-left">
+              <table className="w-full min-w-187.5 text-left">
                 <thead className="bg-background">
                   <tr className="text-xs font-semibold uppercase tracking-wide text-muted">
                     <th className="px-6 py-4">Plan</th>

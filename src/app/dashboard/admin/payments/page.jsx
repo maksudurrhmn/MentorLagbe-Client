@@ -260,7 +260,7 @@ export default function AdminPaymentsPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left">
+              <table className="w-full min-w-225 text-left">
                 <thead className="bg-background">
                   <tr className="text-xs font-semibold uppercase tracking-wide text-muted">
                     <th className="px-6 py-4">User</th>
