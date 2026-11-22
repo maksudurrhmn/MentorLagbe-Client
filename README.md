@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🎓 MentorLagbe
 
-## Getting Started
+MentorLagbe is a full-stack tuition management platform that connects students with tutors. Students can explore and apply for tuition opportunities, tutors can manage tuition posts, and admins can oversee users and platform activities.
 
-First, run the development server:
+## 🌐 Live URL
+
+[Visit MentorLagbe](https://mentorlagbe-ph.vercel.app/)
+
+## 🔐 Admin Credentials
+
+- **Email:** admin@mail.com
+- **Password:** adminpassword
+
+## ✨ Key Features
+
+- 🔑 Secure authentication and role-based access control.
+- 👨‍🎓 Separate dashboards for Students, Tutors, and Admins.
+- 🔍 Browse, search, and filter tuition opportunities.
+- 📝 Students can apply for available tuition posts.
+- 📚 Tutors can create, update, and manage tuition posts.
+- 🛡️ Admins can manage users and approve or reject tuition posts.
+- 💳 Student Pro subscription with Stripe Checkout integration.
+- 👤 Profile management and image upload.
+- 🌓 Light and dark theme support.
+- 📱 Responsive design for desktop, tablet, and mobile devices.
+- ⚡ Loading states, error handling, and custom 404 page.
+
+## 🛠️ Technologies & npm Packages
+
+- Next.js
+- React
+- Tailwind CSS
+- better-auth
+- mongodb
+- stripe
+- lucide-react
+
+## 📦 Installation
 
 ```bash
+git clone YOUR_CLIENT_REPOSITORY_URL
+cd mentorlagbe-client
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔗 Related Repository
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+[MentorLagbe Server](https://github.com/maksudurrhmn/MentorLagbe-Server.git)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 👨‍💻 Author
 
-## Learn More
+**Maksudur Rahman**
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[GitHub Profile](https://github.com/maksudurrhmn)
