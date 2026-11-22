@@ -12,10 +12,10 @@ import {
   Mail,
   ShieldCheck,
   CreditCard,
-  ImagePlus,
 } from 'lucide-react';
 
 import { apiRequest } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
@@ -152,10 +152,16 @@ export default function ProfilePage() {
       setPreview(updatedProfile.image || '');
       setSelectedFile(null);
       setMessage('Your profile has been updated successfully.');
+      toast.success('Profile updated successfully');
     } catch (err) {
       setError(err.message || 'Unable to update your profile.');
+      toast.error(err.message || 'Unable to update your profile.');
     } finally {
       setSaving(false);
+      setTimeout(() => {
+        setError('');
+        setMessage('');
+      }, 3000);
     }
   };
 
@@ -292,7 +298,8 @@ export default function ProfilePage() {
                   <input
                     id="phone"
                     name="phone"
-                    type="tel"
+                    type="number"
+                    minLength={11}
                     value={formData.phone}
                     onChange={handleChange}
                     maxLength={30}

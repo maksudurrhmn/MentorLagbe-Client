@@ -15,6 +15,7 @@ import {
   LoaderCircle,
   Inbox,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const filters = ['all', 'pending', 'accepted', 'rejected'];
 
@@ -46,7 +47,6 @@ export default function TutorApplicationsPage() {
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
   const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
 
   const fetchApplications = useCallback(async () => {
     try {
@@ -88,14 +88,8 @@ export default function TutorApplicationsPage() {
   const updateStatus = async (applicationId, status) => {
     const action = status === 'accepted' ? 'accept' : 'reject';
 
-    if (!window.confirm(`Are you sure you want to ${action} this application?`)) {
-      return;
-    }
-
     try {
       setProcessingId(applicationId);
-      setError('');
-      setNotice('');
 
       await apiRequest(`/api/applications/${applicationId}/status`, {
         method: 'PATCH',
@@ -106,9 +100,9 @@ export default function TutorApplicationsPage() {
         current.map((app) => (app._id === applicationId ? { ...app, status } : app))
       );
 
-      setNotice(`Application ${action}ed successfully.`);
+      toast.success(`Application ${action}ed successfully.`);
     } catch (err) {
-      setError(err.message || `Failed to ${action} application.`);
+      toast.error(err.message || `Failed to ${action} application.`);
     } finally {
       setProcessingId(null);
     }
@@ -178,19 +172,6 @@ export default function TutorApplicationsPage() {
             color="bg-red-500/10 text-red-600"
           />
         </div>
-
-        {/* Notifications */}
-        {error && (
-          <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-600">
-            {error}
-          </div>
-        )}
-
-        {notice && (
-          <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-600">
-            {notice}
-          </div>
-        )}
 
         {/* Application List */}
         <section className="space-y-5">
@@ -324,7 +305,7 @@ export default function TutorApplicationsPage() {
                       <button
                         onClick={() => updateStatus(application._id, 'accepted')}
                         disabled={processingId === application._id}
-                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50 cursor-pointer"
                       >
                         {processingId === application._id ? (
                           <LoaderCircle size={16} className="animate-spin" />
@@ -337,7 +318,7 @@ export default function TutorApplicationsPage() {
                       <button
                         onClick={() => updateStatus(application._id, 'rejected')}
                         disabled={processingId === application._id}
-                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-red-500/30 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-500/10 disabled:opacity-50"
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-red-500/30 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-500/10 disabled:opacity-50 cursor-pointer"
                       >
                         <XCircle size={16} />
                         Reject

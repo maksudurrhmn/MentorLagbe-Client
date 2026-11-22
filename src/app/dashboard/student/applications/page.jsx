@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 
 import { apiRequest } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 const statusStyles = {
   pending: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
@@ -84,10 +85,6 @@ export default function StudentApplicationsPage() {
 
   // Cancel a pending application.
   const handleCancel = async (applicationId) => {
-    const confirmed = window.confirm('Are you sure you want to cancel this application?');
-
-    if (!confirmed) return;
-
     try {
       setCancelingId(applicationId);
       setError('');
@@ -97,8 +94,10 @@ export default function StudentApplicationsPage() {
       });
 
       setApplications((prev) => prev.filter((application) => application._id !== applicationId));
+      toast.success('Application cancelled successfully.');
     } catch (err) {
       setError(err.message || 'Failed to cancel application.');
+      toast.error(err.message || 'Failed to cancel application.');
     } finally {
       setCancelingId(null);
     }

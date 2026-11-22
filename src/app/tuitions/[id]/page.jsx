@@ -8,7 +8,6 @@ import {
   BookOpen,
   CalendarDays,
   CheckCircle2,
-  Clock,
   GraduationCap,
   Loader2,
   MapPin,
@@ -17,9 +16,12 @@ import {
   Wallet,
 } from 'lucide-react';
 import { apiRequest } from '@/lib/api';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export default function TuitionDetailsPage() {
   const { id } = useParams();
+  const router = useRouter();
 
   const [tuition, setTuition] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -91,17 +93,24 @@ export default function TuitionDetailsPage() {
         type: 'success',
         message: response.message || 'Your application was submitted successfully!',
       });
+      toast.success(response.message || 'Your application was submitted successfully!');
 
       setFormData({
         studentPhone: '',
         preferredSchedule: '',
         studentNote: '',
       });
+
+      setTimeout(() => {
+        router.push('/tuitions');
+        router.refresh();
+      }, 1000);
     } catch (err) {
       setNotice({
         type: 'error',
         message: err.message || 'Failed to submit your application.',
       });
+      toast.error(err.message || 'Failed to submit your application.');
     } finally {
       setSubmitting(false);
     }

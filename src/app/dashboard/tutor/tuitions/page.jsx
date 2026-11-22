@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 
 import { apiRequest } from '@/lib/api';
+import toast from 'react-hot-toast';
+import { set } from 'better-auth';
 
 const filters = ['all', 'pending', 'approved', 'rejected'];
 
@@ -57,8 +59,6 @@ export default function MyTuitionsPage() {
 
   const handleToggleStatus = async (tuition) => {
     setActionId(tuition._id);
-    setError('');
-    setMessage('');
 
     try {
       await apiRequest(`/api/tuitions/${tuition._id}/status`, {
@@ -66,36 +66,28 @@ export default function MyTuitionsPage() {
         body: { isActive: !tuition.isActive },
       });
 
-      setMessage(`Tuition post ${tuition.isActive ? 'deactivated' : 'activated'} successfully.`);
+      toast.success(`Tuition post ${tuition.isActive ? 'deactivated' : 'activated'} successfully.`);
 
       await loadTuitions();
     } catch (err) {
-      setError(err.message || 'Unable to update tuition status.');
+      toast.error(err.message || 'Unable to update tuition status.');
     } finally {
       setActionId(null);
     }
   };
 
   const handleDelete = async (tuition) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${tuition.title}"? This action cannot be undone.`
-    );
-
-    if (!confirmed) return;
-
     setActionId(tuition._id);
-    setError('');
-    setMessage('');
 
     try {
       await apiRequest(`/api/tuitions/${tuition._id}`, {
         method: 'DELETE',
       });
 
-      setMessage('Tuition post deleted successfully.');
+      toast.success('Tuition post deleted successfully.');
       await loadTuitions();
     } catch (err) {
-      setError(err.message || 'Unable to delete this tuition post.');
+      toast.error(err.message || 'Unable to delete this tuition post.');
     } finally {
       setActionId(null);
     }
@@ -419,14 +411,6 @@ export default function MyTuitionsPage() {
                         Delete
                       </button>
                     </div>
-
-                    <Link
-                      href={`/dashboard/tutor/tuitions/${tuition._id}/edit`}
-                      className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                    >
-                      Manage tuition details
-                      <ArrowUpRight size={13} />
-                    </Link>
                   </div>
                 </article>
               ))}

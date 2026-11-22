@@ -1,6 +1,13 @@
 import Link from 'next/link';
 import { GraduationCap } from 'lucide-react';
 
+const socialLinks = [
+  { name: 'Facebook', href: 'https://facebook.com/' },
+  { name: 'Instagram', href: 'https://instagram.com/' },
+  { name: 'LinkedIn', href: 'https://linkedin.com/' },
+  { name: 'GitHub', href: 'https://github.com/' },
+];
+
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-surface">
@@ -30,7 +37,11 @@ export default function Footer() {
 
             <div className="mt-4 flex flex-col gap-3 text-sm text-muted">
               <Link href="/tuitions" className="transition hover:text-primary">
-                Exprole Tuition
+                Explore Tuitions
+              </Link>
+
+              <Link href="/pricing" className="transition hover:text-primary">
+                Pricing
               </Link>
 
               <Link href="/signup" className="transition hover:text-primary">
@@ -38,11 +49,30 @@ export default function Footer() {
               </Link>
             </div>
           </div>
+
+          {/* Social links */}
+          <div>
+            <h3 className="font-semibold text-foreground">Follow Us</h3>
+
+            <div className="mt-4 flex flex-col gap-3 text-sm text-muted">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-fit transition hover:text-primary"
+                >
+                  {social.name}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Copyright */}
         <div className="mt-12 flex flex-col justify-between gap-3 border-t border-border pt-6 text-sm text-muted sm:flex-row">
-          <p>©2026 MentorLagbe. All rights reserved.</p>
+          <p>© 2026 MentorLagbe. All rights reserved.</p>
 
           <p>Built to connect, teach, and grow.</p>
         </div>

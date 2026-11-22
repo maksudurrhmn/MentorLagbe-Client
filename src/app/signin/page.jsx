@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, GraduationCap, Mail, LockKeyhole, ArrowRight, ArrowLeft } from 'lucide-react';
 import { signIn } from '@/lib/auth-client';
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,11 +36,13 @@ export default function LoginPage() {
 
       if (error) {
         setErrorMessage(error.message || 'Invalid email or password.');
+        toast.error(error.message || 'Invalid email or password.');
         return;
       }
 
       router.push('/');
       router.refresh();
+      toast.success('Account logged in successfully');
     } catch (error) {
       setErrorMessage(error.message || 'Something went wrong. Please try again.');
     } finally {

@@ -14,6 +14,7 @@ import {
   Phone,
 } from 'lucide-react';
 import { apiRequest } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 const filters = ['all', 'student', 'tutor', 'admin'];
 
@@ -47,7 +48,7 @@ const formatDate = (date) => {
 
 function StatCard({ title, value, icon: Icon, color }) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-5 sm:p-6">
+    <div className="rounded-xl border border-border bg-surface p-5 sm:p-6 hover:border-primary/40">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-muted">{title}</p>
 
@@ -120,16 +121,8 @@ export default function AdminUsersPage() {
   const handleRoleChange = async (user, nextRole) => {
     if (user.role === nextRole) return;
 
-    const confirmed = window.confirm(
-      `Change ${user.name || user.email}'s role from ${user.role} to ${nextRole}?`
-    );
-
-    if (!confirmed) return;
-
     try {
       setUpdatingId(user._id);
-      setError('');
-      setNotice('');
 
       await apiRequest(`/api/users/admin/${user._id}/role`, {
         method: 'PATCH',
@@ -140,9 +133,9 @@ export default function AdminUsersPage() {
         current.map((item) => (item._id === user._id ? { ...item, role: nextRole } : item))
       );
 
-      setNotice(`User role updated to ${nextRole} successfully.`);
+      toast.success(`User role updated to ${nextRole} successfully.`);
     } catch (err) {
-      setError(err.message || 'Failed to update user role.');
+      toast.error(err.message || 'Failed to update user role.');
     } finally {
       setUpdatingId(null);
     }
@@ -167,7 +160,7 @@ export default function AdminUsersPage() {
             type="button"
             onClick={fetchUsers}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-background disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-background disabled:cursor-not-allowed disabled:opacity-60 hover:border-primary/40"
           >
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
             Refresh
@@ -249,7 +242,7 @@ export default function AdminUsersPage() {
                 className={`rounded-lg px-4 py-2 text-sm font-medium capitalize transition ${
                   activeFilter === filter
                     ? 'bg-primary text-white'
-                    : 'border border-border bg-background text-muted hover:text-foreground'
+                    : 'border border-border bg-background text-muted hover:text-foreground hover:border-primary/40'
                 }`}
               >
                 {filter} ({counts[filter]})

@@ -133,7 +133,7 @@ export default function DashboardHeader({ onMenuClick }) {
           disabled={loggingOut}
           title="Logout"
           aria-label="Logout"
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-muted transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-muted transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
         >
           {loggingOut ? <LoaderCircle size={18} className="animate-spin" /> : <LogOut size={18} />}
         </button>

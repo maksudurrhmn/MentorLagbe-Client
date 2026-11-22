@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiRequest } from '@/lib/api';
 import {
@@ -15,9 +15,11 @@ import {
   Save,
   Wallet,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function EditTuitionPage() {
   const { id } = useParams();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -172,11 +174,18 @@ export default function EditTuitionPage() {
       setPreview(bannerImage);
       setImageFile(null);
       setMessage('Tuition updated successfully. It is now pending admin approval.');
+      toast.success('Tuition updated successfully. It is now pending admin approval.');
 
       const fileInput = document.getElementById('bannerImage');
       if (fileInput) fileInput.value = '';
+
+      setTimeout(() => {
+        router.push('/dashboard/tutor/tuitions');
+        router.refresh();
+      }, 3000);
     } catch (err) {
       setError(err.message || 'Unable to update tuition.');
+      toast.error(err.message || 'Unable to update tuition.');
     } finally {
       setSaving(false);
     }
@@ -224,7 +233,7 @@ export default function EditTuitionPage() {
         <div>
           <Link
             href="/dashboard/tutor/tuitions"
-            className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-muted transition hover:text-primary"
+            className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-muted transition hover:text-primary hover:gap-3"
           >
             <ArrowLeft size={16} />
             Back to My Tuitions

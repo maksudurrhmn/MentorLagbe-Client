@@ -134,7 +134,7 @@ export default function Navbar() {
       <Link
         href={dashboardHref}
         onClick={closeMenus}
-        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition hover:bg-surface-secondary"
+        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition hover:bg-surface"
       >
         <LayoutDashboard size={17} />
         Dashboard
@@ -143,7 +143,7 @@ export default function Navbar() {
       <Link
         href="/dashboard/profile"
         onClick={closeMenus}
-        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition hover:bg-surface-secondary"
+        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition hover:bg-surface"
       >
         <UserRound size={17} />
         My Profile
@@ -153,7 +153,7 @@ export default function Navbar() {
         type="button"
         onClick={handleLogout}
         disabled={isLoggingOut}
-        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-red-500 transition hover:bg-surface-secondary disabled:opacity-50"
+        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-red-500 transition hover:bg-surface disabled:opacity-50 cursor-pointer"
       >
         <LogOut size={17} />
         {isLoggingOut ? 'Logging out...' : 'Logout'}

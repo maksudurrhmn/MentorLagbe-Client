@@ -14,6 +14,8 @@ import {
   FileText,
 } from 'lucide-react';
 import { apiRequest } from '@/lib/api';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const initialForm = {
   title: '',
@@ -27,6 +29,8 @@ const initialForm = {
 };
 
 export default function CreateTuitionPage() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState(initialForm);
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState('');
@@ -132,6 +136,9 @@ export default function CreateTuitionPage() {
       setSuccess(
         'Your tuition post has been submitted successfully. It is now pending admin approval.'
       );
+      toast.success(
+        'Your tuition post has been submitted successfully. It is now pending admin approval.'
+      );
 
       setFormData(initialForm);
       setImageFile(null);
@@ -139,8 +146,14 @@ export default function CreateTuitionPage() {
 
       const fileInput = document.getElementById('bannerImage');
       if (fileInput) fileInput.value = '';
+
+      setTimeout(() => {
+        router.push('/dashboard/tutor/tuitions');
+        router.refresh();
+      }, 3000);
     } catch (err) {
       setError(err.message || 'Unable to create your tuition post.');
+      toast.error(err.message || 'Unable to create your tuition post.');
     } finally {
       setSubmitting(false);
     }
@@ -153,7 +166,7 @@ export default function CreateTuitionPage() {
         <div>
           <Link
             href="/dashboard/tutor/tuitions"
-            className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-muted transition hover:text-primary"
+            className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-muted transition hover:text-primary hover:gap-3"
           >
             <ArrowLeft size={16} />
             Back to My Tuitions
