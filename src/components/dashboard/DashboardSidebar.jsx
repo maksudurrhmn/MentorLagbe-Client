@@ -10,10 +10,8 @@ import {
   CreditCard,
   UserRound,
   Users,
-  ClipboardList,
-  Wallet,
   X,
-  PlusCircle,
+  GraduationCap,
 } from 'lucide-react';
 
 import useAuth from '@/hooks/useAuth';
@@ -26,7 +24,7 @@ const navigation = {
       icon: LayoutDashboard,
     },
     {
-      label: 'Find Tuitions',
+      label: 'Explore Tuitions',
       href: '/tuitions',
       icon: Search,
     },
@@ -122,8 +120,11 @@ export default function DashboardSidebar({ isOpen, onClose }) {
           <Link
             href="/"
             onClick={onClose}
-            className="text-xl font-bold tracking-tight text-primary"
+            className="inline-flex gap-1 items-center text-xl font-bold tracking-tight text-primary"
           >
+            <span className="rounded-xl bg-primary p-2 text-white">
+              <GraduationCap size={18} />
+            </span>{' '}
             MentorLagbe
           </Link>
 

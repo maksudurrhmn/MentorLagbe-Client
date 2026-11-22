@@ -31,28 +31,16 @@ const statusStyles = {
 
 const quickActions = [
   {
-    title: 'Find Tutors',
+    title: 'Explore Tuitions',
     description: 'Discover qualified tutors for your needs.',
     href: '/tutors',
     icon: Search,
-  },
-  {
-    title: 'Explore Tuitions',
-    description: 'Browse available tuition opportunities.',
-    href: '/tuitions',
-    icon: BookOpen,
   },
   {
     title: 'My Applications',
     description: 'Track your submitted applications.',
     href: '/dashboard/student/applications',
     icon: ClipboardList,
-  },
-  {
-    title: 'Post a Tuition',
-    description: 'Create and manage your tuition requirements.',
-    href: '/dashboard/student/tuitions',
-    icon: Plus,
   },
 ];
 

@@ -210,7 +210,7 @@ export default function TutorApplicationsPage() {
                   className={`rounded-lg px-3.5 py-2 text-sm font-medium capitalize transition ${
                     activeFilter === filter
                       ? 'bg-primary text-white'
-                      : 'border border-border bg-surface text-muted hover:text-foreground'
+                      : 'border border-border bg-surface text-muted hover:text-foreground hover:border-primary/40'
                   }`}
                 >
                   {filter}
