@@ -277,7 +277,7 @@ export default function MyTuitionsPage() {
               {filter === 'all' && (
                 <Link
                   href="/dashboard/tutor/tuitions/new"
-                  className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                  className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                 >
                   <Plus size={17} />
                   Create Tuition

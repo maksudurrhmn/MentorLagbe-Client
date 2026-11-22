@@ -26,7 +26,7 @@ const statusStyles = {
 
 function StatCard({ title, value, icon: Icon, description }) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-5">
+    <div className="rounded-xl border border-border bg-surface p-5 hover:border-primary/40">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm text-muted">{title}</p>
@@ -154,12 +154,13 @@ function TutorDashboardContent() {
             <h2 className="text-lg font-semibold text-foreground">Your Overview</h2>
 
             <button
+              type="button"
               onClick={fetchDashboardData}
               disabled={loading}
-              title="Refresh dashboard"
-              className="rounded-lg border border-border bg-surface p-2 text-muted transition hover:text-foreground disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
             >
-              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+              Refresh
             </button>
           </div>
 

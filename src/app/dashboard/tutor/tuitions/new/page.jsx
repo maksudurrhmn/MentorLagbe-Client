@@ -165,7 +165,7 @@ export default function CreateTuitionPage() {
             </div>
 
             <div>
-              <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Post a Tuition</h1>
+              <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Create Tuition</h1>
               <p className="mt-1 text-sm text-muted">
                 Share your tuition opportunity and connect with students.
               </p>

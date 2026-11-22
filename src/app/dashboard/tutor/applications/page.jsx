@@ -26,7 +26,7 @@ const statusStyles = {
 
 function StatCard({ title, value, icon: Icon, color }) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-5">
+    <div className="rounded-xl border border-border bg-surface p-5 hover:border-primary/40">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted">{title}</p>
@@ -141,11 +141,12 @@ export default function TutorApplicationsPage() {
           </div>
 
           <button
+            type="button"
             onClick={fetchApplications}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-background disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
             Refresh
           </button>
         </div>
