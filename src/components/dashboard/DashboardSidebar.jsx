@@ -13,6 +13,7 @@ import {
   ClipboardList,
   Wallet,
   X,
+  PlusCircle,
 } from 'lucide-react';
 
 import useAuth from '@/hooks/useAuth';
@@ -25,19 +26,14 @@ const navigation = {
       icon: LayoutDashboard,
     },
     {
-      label: 'Find Tutors',
-      href: '/tutors',
+      label: 'Find Tuitions',
+      href: '/tuitions',
       icon: Search,
     },
     {
       label: 'My Applications',
       href: '/dashboard/student/applications',
       icon: FileText,
-    },
-    {
-      label: 'My Tuitions',
-      href: '/dashboard/student/tuitions',
-      icon: BookOpen,
     },
     {
       label: 'Payments',
@@ -63,9 +59,9 @@ const navigation = {
       icon: Search,
     },
     {
-      label: 'My Applications',
-      href: '/dashboard/tutor/applications',
-      icon: FileText,
+      label: 'Post New Tuition',
+      href: '/dashboard/tutor/tuitions/new',
+      icon: PlusCircle,
     },
     {
       label: 'My Tuitions',
@@ -73,9 +69,14 @@ const navigation = {
       icon: BookOpen,
     },
     {
-      label: 'Earnings',
-      href: '/dashboard/tutor/earnings',
-      icon: Wallet,
+      label: 'Applicants',
+      href: '/dashboard/tutor/applications',
+      icon: Users,
+    },
+    {
+      label: 'Payments',
+      href: '/dashboard/tutor/payments',
+      icon: CreditCard,
     },
     {
       label: 'My Profile',
@@ -101,12 +102,7 @@ const navigation = {
       icon: BookOpen,
     },
     {
-      label: 'Manage Applications',
-      href: '/dashboard/admin/applications',
-      icon: ClipboardList,
-    },
-    {
-      label: 'Payments',
+      label: 'Payments & Transactions',
       href: '/dashboard/admin/payments',
       icon: CreditCard,
     },
