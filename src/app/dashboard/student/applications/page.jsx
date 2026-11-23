@@ -49,21 +49,14 @@ export default function StudentApplicationsPage() {
   const fetchApplications = useCallback(async () => {
     try {
       setError('');
-
-      // Preserve existing cards while refreshing.
-      if (applications.length === 0) {
-        setLoading(true);
-      }
-
+      setLoading(true);
       setRefreshing(true);
 
       const result = await apiRequest('/api/applications/my', {
         cache: 'no-store',
       });
 
-      // Support both array and nested API response formats.
       const payload = result?.data ?? result;
-
       const applicationList = Array.isArray(payload) ? payload : payload?.applications;
 
       if (!Array.isArray(applicationList)) {
@@ -77,7 +70,7 @@ export default function StudentApplicationsPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [applications.length]);
+  }, []);
 
   useEffect(() => {
     fetchApplications();
@@ -156,7 +149,7 @@ export default function StudentApplicationsPage() {
             className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
           >
             <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
-            {refreshing ? 'Refresh' : 'Refresh'}
+            Refresh
           </button>
         </section>
 

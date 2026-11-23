@@ -149,25 +149,25 @@ export default function TutorApplicationsPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             title="Total Applications"
-            value={stats.total}
+            value={loading ? '—' : stats.total}
             icon={Users}
             color="bg-primary/10 text-primary"
           />
           <StatCard
             title="Pending"
-            value={stats.pending}
+            value={loading ? '—' : stats.pending}
             icon={Clock}
             color="bg-amber-500/10 text-amber-600"
           />
           <StatCard
             title="Accepted"
-            value={stats.accepted}
+            value={loading ? '—' : stats.accepted}
             icon={CheckCircle2}
             color="bg-emerald-500/10 text-emerald-600"
           />
           <StatCard
             title="Rejected"
-            value={stats.rejected}
+            value={loading ? '—' : stats.rejected}
             icon={XCircle}
             color="bg-red-500/10 text-red-600"
           />

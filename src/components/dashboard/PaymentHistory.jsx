@@ -166,7 +166,9 @@ export default function PaymentHistory({ role }) {
                   </div>
                 </div>
 
-                <h2 className="mt-4 text-2xl font-bold text-foreground">{stat.value}</h2>
+                <h2 className="mt-4 text-2xl font-bold text-foreground">
+                  {loading ? '—' : stat.value}
+                </h2>
               </div>
             );
           })}

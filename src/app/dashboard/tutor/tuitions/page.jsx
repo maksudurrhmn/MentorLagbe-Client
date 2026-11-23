@@ -13,12 +13,10 @@ import {
   CalendarDays,
   MapPin,
   Wallet,
-  ArrowUpRight,
 } from 'lucide-react';
 
 import { apiRequest } from '@/lib/api';
 import toast from 'react-hot-toast';
-import { set } from 'better-auth';
 
 const filters = ['all', 'pending', 'approved', 'rejected'];
 
@@ -60,15 +58,20 @@ export default function MyTuitionsPage() {
   const handleToggleStatus = async (tuition) => {
     setActionId(tuition._id);
 
+    const newStatus = !tuition.isActive;
+
     try {
       await apiRequest(`/api/tuitions/${tuition._id}/status`, {
         method: 'PATCH',
-        body: { isActive: !tuition.isActive },
+        body: { isActive: newStatus },
       });
 
-      toast.success(`Tuition post ${tuition.isActive ? 'deactivated' : 'activated'} successfully.`);
+      // Update only the selected tuition.
+      setTuitions((prev) =>
+        prev.map((item) => (item._id === tuition._id ? { ...item, isActive: newStatus } : item))
+      );
 
-      await loadTuitions();
+      toast.success(`Tuition post ${newStatus ? 'activated' : 'deactivated'} successfully.`);
     } catch (err) {
       toast.error(err.message || 'Unable to update tuition status.');
     } finally {
@@ -84,8 +87,10 @@ export default function MyTuitionsPage() {
         method: 'DELETE',
       });
 
+      // Remove only the deleted tuition from the list.
+      setTuitions((prev) => prev.filter((item) => item._id !== tuition._id));
+
       toast.success('Tuition post deleted successfully.');
-      await loadTuitions();
     } catch (err) {
       toast.error(err.message || 'Unable to delete this tuition post.');
     } finally {

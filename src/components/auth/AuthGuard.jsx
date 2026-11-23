@@ -29,7 +29,7 @@ export default function AuthGuard({ children, allowedRoles = [], redirectTo = '/
   // Prevent protected content from flashing before authorization
   if (isLoading || !isAuthenticated || !hasPermission) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-background">
+      <div className="flex min-h-dvh items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
           <div className="h-9 w-9 animate-spin rounded-full border-4 border-border border-t-primary" />
 

@@ -143,7 +143,7 @@ export default function AdminPaymentsPage() {
           <button
             onClick={fetchPayments}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-background disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-background disabled:cursor-not-allowed disabled:opacity-60 hover:border-primary/40"
           >
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
             Refresh
@@ -158,7 +158,7 @@ export default function AdminPaymentsPage() {
             return (
               <div
                 key={stat.label}
-                className="rounded-xl border border-border bg-surface p-5 sm:p-6"
+                className="rounded-xl border border-border bg-surface p-5 sm:p-6 hover:border-primary/40"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-muted">{stat.label}</p>

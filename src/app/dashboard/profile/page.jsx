@@ -173,7 +173,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <main className="px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto flex min-h-64 max-w-7xl items-center justify-center">
+        <div className="mx-auto flex min-h-dvh max-w-7xl items-center justify-center">
           <LoaderCircle size={30} className="animate-spin text-primary" />
         </div>
       </main>
